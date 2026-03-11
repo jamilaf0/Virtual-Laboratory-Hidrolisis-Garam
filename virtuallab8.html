@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Hasil Praktikum - Hidrolisis Garam</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e88e5 0%, #e91e63 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #5b8dd3, #c77ab5);
+            color: white;
+            padding: 25px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .header-logo {
+            width: 70px;
+            height: 70px;
+            flex-shrink: 0;
+        }
+
+        .header-text {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .header-text h1 {
+            font-size: 2em;
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .header-text p {
+            font-size: 1.1em;
+            margin: 0;
+            font-weight: 400;
+            opacity: 0.95;
+            padding-left: 35px;
+        }
+
+        footer {
+            background: linear-gradient(135deg, #5b8dd3, #c77ab5);
+            padding: 30px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        footer p {
+            margin: 5px 0;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+
+        footer p:first-child {
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .back-to-dashboard {
+            margin: 30px 40px 0;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: #4a7bb8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-back:hover {
+            background: #3a6ba8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .content-page {
+            padding: 40px;
+        }
+
+        .content-box {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid #1e88e5;
+        }
+
+        .content-box h2 {
+            color: #1e88e5;
+            margin-bottom: 20px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .data-table th {
+            background: #1e88e5;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .data-table input, .data-table select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .data-table input:focus, .data-table select:focus {
+            outline: none;
+            border-color: #1e88e5;
+        }
+
+        .status-correct {
+            color: #4caf50;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .status-incorrect {
+            color: #f44336;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            min-height: 150px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #1e88e5;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1e88e5, #e91e63);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .score-display {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .score-display h3 {
+            color: #1e88e5;
+            margin-bottom: 15px;
+        }
+
+        .score-value {
+            font-size: 3em;
+            color: #4caf50;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+            z-index: 1000;
+            max-width: 400px;
+        }
+
+        .notification.success {
+            border-left: 5px solid #4caf50;
+        }
+
+        .notification.error {
+            border-left: 5px solid #f44336;
+        }
+
+        .notification.info {
+            border-left: 5px solid #1e88e5;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            
+            .data-table {
+                font-size: 14px;
+            }
+
+            .data-table th, .data-table td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="logoum.png" alt="Logo UM" class="header-logo">
+            <div class="header-text">
+                <h1>UNIVERSITAS NEGERI MALANG</h1>
+                <p>Laboratorium Virtual Hidrolisis Garam</p>
+            </div>
+        </header>
+
+        <div class="back-to-dashboard">
+    <button class="btn-back" onclick="location.href='virtuallab2.html'">
+        ⬅ Kembali ke Dashboard
+    </button>
+</div>
+
+        <div class="content-page">
+            <!-- IDENTITAS SISWA -->
+            <div class="content-box" style="border-left-color:#e91e63;">
+                <h2 style="color:#e91e63;">📋 Identitas Siswa</h2>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-top:10px;">
+                    <div>
+                        <label style="font-weight:600;color:#444;display:block;margin-bottom:6px;">Nama Lengkap</label>
+                        <input type="text" id="input-nama" placeholder="Masukkan nama lengkap..." style="width:100%;padding:10px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:1em;outline:none;">
+                    </div>
+                    <div>
+                        <label style="font-weight:600;color:#444;display:block;margin-bottom:6px;">Kelas</label>
+                        <input type="text" id="input-kelas" placeholder="Contoh: XI IPA 1" style="width:100%;padding:10px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:1em;outline:none;">
+                    </div>
+                    <div>
+                        <label style="font-weight:600;color:#444;display:block;margin-bottom:6px;">Nomor Absen</label>
+                        <input type="text" id="input-absen" placeholder="Contoh: 12" style="width:100%;padding:10px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:1em;outline:none;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-box">
+                <h2>Tabel Data Hasil Pengamatan</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Larutan</th>
+                            <th>Lakmus Merah</th>
+                            <th>Lakmus Biru</th>
+                            <th>pH</th>
+                            <th>Sifat Larutan</th>
+                            <th>Jenis Hidrolisis</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-table-body"></tbody>
+                </table>
+                
+                <h3 style="margin-top: 30px; color: #1e88e5;">Kesimpulan Praktikum</h3>
+                <textarea id="conclusion-text" placeholder="Tuliskan kesimpulan Anda tentang hubungan antara jenis garam, hidrolisis, dan pH larutan. Minimal 100 karakter."></textarea>
+                
+                <div style="margin-top: 20px; text-align: center;">
+                    <button class="btn" onclick="submitData()">Submit Data Pengamatan</button>
+                </div>
+                
+                <div class="score-display hidden" id="score-display">
+                    <h3>Hasil Penilaian Data</h3>
+                    <div class="score-value" id="data-score">0</div>
+                    <p id="data-feedback"></p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Laboratorium Virtual Hidrolisis Garam</p>
+            <p>Jamila Fitrianingsih | Pendidikan Kimia</p>
+            <p>Universitas Negeri Malang</p>
+            <p>© 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        // Solutions data
+        const solutions = {
+            '(NH4)2SO4': { 
+                ph: 5.5, 
+                nature: 'Asam', 
+                redLitmus: 'Tetap Merah', 
+                blueLitmus: 'Berubah Merah', 
+                hydrolysis: 'Asam kuat-basa lemah'
+            },
+            'NaCl': { 
+                ph: 7.0, 
+                nature: 'Netral', 
+                redLitmus: 'Tetap Merah', 
+                blueLitmus: 'Tetap Biru', 
+                hydrolysis: 'Asam kuat-basa kuat'
+            },
+            'CH3COONa': { 
+                ph: 8.9, 
+                nature: 'Basa', 
+                redLitmus: 'Berubah Biru', 
+                blueLitmus: 'Tetap Biru', 
+                hydrolysis: 'Asam lemah-basa kuat'
+            },
+            'NH4CH3COO': { 
+                ph: 7.0, 
+                nature: 'Netral', 
+                redLitmus: 'Tetap Merah', 
+                blueLitmus: 'Tetap Biru', 
+                hydrolysis: 'Asam lemah-basa lemah'
+            },
+            'Na2SO4': { 
+                ph: 7.0, 
+                nature: 'Netral', 
+                redLitmus: 'Tetap Merah', 
+                blueLitmus: 'Tetap Biru', 
+                hydrolysis: 'Asam kuat-basa kuat'
+            }
+        };
+
+        // Notification
+        function showNotification(msg, type) {
+            const notif = document.createElement('div');
+            notif.className = `notification ${type}`;
+            notif.innerHTML = `<strong>${type==='success'?'✓':type==='error'?'✗':'ℹ'}</strong> ${msg}`;
+            document.body.appendChild(notif);
+            
+            setTimeout(() => notif.remove(), 3000);
+        }
+
+        // Load table
+        function loadDataTable() {
+            const tbody = document.getElementById('data-table-body');
+            tbody.innerHTML = '';
+            
+            const solutionList = ['(NH4)2SO4', 'NaCl', 'CH3COONa', 'NH4CH3COO', 'Na2SO4'];
+            const solutionNames = ['(NH<sub>4</sub>)<sub>2</sub>SO<sub>4</sub>', 'NaCl', 'CH<sub>3</sub>COONa', 'NH<sub>4</sub>CH<sub>3</sub>COO', 'Na<sub>2</sub>SO<sub>4</sub>'];
+            
+            solutionList.forEach((sol, i) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${i+1}</td>
+                    <td>${solutionNames[i]}</td>
+                    <td>
+                        <select id="red${i}">
+                            <option value="">Pilih...</option>
+                            <option value="Tetap Merah">Tetap Merah</option>
+                            <option value="Berubah Biru">Berubah Biru</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select id="blue${i}">
+                            <option value="">Pilih...</option>
+                            <option value="Tetap Biru">Tetap Biru</option>
+                            <option value="Berubah Merah">Berubah Merah</option>
+                        </select>
+                    </td>
+                    <td><input type="number" step="0.1" min="0" max="14" id="ph${i}" placeholder="0.0 - 14.0"></td>
+                    <td>
+                        <select id="nature${i}">
+                            <option value="">Pilih...</option>
+                            <option value="Asam">Asam</option>
+                            <option value="Basa">Basa</option>
+                            <option value="Netral">Netral</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select id="hydro${i}">
+                            <option value="">Pilih...</option>
+                            <option value="Asam kuat-basa kuat">Asam kuat-basa kuat</option>
+                            <option value="Asam lemah-basa kuat">Asam lemah-basa kuat</option>
+                            <option value="Asam kuat-basa lemah">Asam kuat-basa lemah</option>
+                            <option value="Asam lemah-basa lemah">Asam lemah-basa lemah</option>
+                        </select>
+                    </td>
+                    <td id="status${i}"></td>
+                `;
+            });
+        }
+
+        function submitData() {
+            // Validasi identitas
+            const nama  = document.getElementById('input-nama').value.trim();
+            const kelas = document.getElementById('input-kelas').value.trim();
+            const absen = document.getElementById('input-absen').value.trim();
+            if (!nama || !kelas || !absen) {
+                showNotification('Isi identitas siswa terlebih dahulu!', 'error');
+                return;
+            }
+
+            const solutionList = ['(NH4)2SO4', 'NaCl', 'CH3COONa', 'NH4CH3COO', 'Na2SO4'];
+            let score = 0;
+            let correct = 0;
+            
+            // Validasi semua field terisi
+            let allFilled = true;
+            solutionList.forEach((sol, i) => {
+                const red   = document.getElementById(`red${i}`).value;
+                const blue  = document.getElementById(`blue${i}`).value;
+                const ph    = document.getElementById(`ph${i}`).value;
+                const nature = document.getElementById(`nature${i}`).value;
+                const hydro = document.getElementById(`hydro${i}`).value;
+                if (!red || !blue || !ph || !nature || !hydro) allFilled = false;
+            });
+            
+            if (!allFilled) {
+                showNotification('Lengkapi semua data pengamatan!', 'error');
+                return;
+            }
+            
+            const conclusion = document.getElementById('conclusion-text').value;
+            if (conclusion.length < 100) {
+                showNotification('Kesimpulan minimal 100 karakter!', 'error');
+                return;
+            }
+            
+            // Check answers & build detailJawaban
+            const detailJawaban = [];
+            solutionList.forEach((sol, i) => {
+                const red   = document.getElementById(`red${i}`).value;
+                const blue  = document.getElementById(`blue${i}`).value;
+                const ph    = parseFloat(document.getElementById(`ph${i}`).value);
+                const nature = document.getElementById(`nature${i}`).value;
+                const hydro = document.getElementById(`hydro${i}`).value;
+                
+                const ans    = solutions[sol];
+                const status = document.getElementById(`status${i}`);
+                
+                const isCorrect = red===ans.redLitmus && blue===ans.blueLitmus &&
+                                  Math.abs(ph-ans.ph)<0.5 && nature===ans.nature && hydro===ans.hydrolysis;
+                
+                if (isCorrect) { score += 20; correct++; status.innerHTML = '<span class="status-correct">✓</span>'; }
+                else { status.innerHTML = '<span class="status-incorrect">✗</span>'; }
+
+                detailJawaban.push({
+                    larutan: sol,
+                    lakmusMerah: red,
+                    lakmusBiru:  blue,
+                    pH:    ph,
+                    sifat: nature,
+                    hidrolisis: hydro,
+                    benar: isCorrect,
+                    jawabanYangBenar: {
+                        lakmusMerah: ans.redLitmus,
+                        lakmusBiru:  ans.blueLitmus,
+                        pH:    ans.ph,
+                        sifat: ans.nature,
+                        hidrolisis: ans.hydrolysis
+                    }
+                });
+            });
+            
+            document.getElementById('score-display').classList.remove('hidden');
+            document.getElementById('data-score').textContent = score;
+            document.getElementById('data-feedback').textContent =
+                `${correct}/5 benar. ` + (score>=80 ? 'Sangat Baik!' : score>=60 ? 'Baik!' : 'Perlu perbaikan.');
+
+            // Simpan ke localStorage → terbaca di virtuallab10
+            const dataToSave = {
+                nama:    nama,
+                kelas:   kelas,
+                absen:   absen,
+                nilaiPraktikum: score,
+                tanggal: new Date().toISOString(),
+                kesimpulan: conclusion,
+                detailJawaban: detailJawaban
+            };
+            localStorage.setItem('dataScore_' + nama + '_' + kelas + '_' + absen, JSON.stringify(dataToSave));
+            
+            showNotification('Data tersubmit & tersimpan! Nilai: ' + score, 'success');
+        }
+
+        // Isi tabel otomatis dari data virtuallab7
+        function loadDataFromLab7() {
+            const raw = localStorage.getItem('labData_virtuallab7');
+            if (!raw) return;
+
+            const labData = JSON.parse(raw);
+            const solutionList = ['(NH4)2SO4', 'NaCl', 'CH3COONa', 'NH4CH3COO', 'Na2SO4'];
+
+            labData.forEach(item => {
+                const idx = solutionList.indexOf(item.solution);
+                if (idx === -1) return;
+
+                const redEl    = document.getElementById(`red${idx}`);
+                const blueEl   = document.getElementById(`blue${idx}`);
+                const phEl     = document.getElementById(`ph${idx}`);
+                const natureEl = document.getElementById(`nature${idx}`);
+                const hydroEl  = document.getElementById(`hydro${idx}`);
+
+                if (redEl)    redEl.value    = item.redLitmus  || '';
+                if (blueEl)   blueEl.value   = item.blueLitmus || '';
+                if (phEl)     phEl.value     = item.ph         || '';
+                if (natureEl) natureEl.value = item.nature     || '';
+                if (hydroEl)  hydroEl.value  = item.hydrolysis || '';
+            });
+
+            if (labData.length > 0) {
+                showNotification('Data dari Virtual Lab berhasil dimuat!', 'success');
+            }
+        }
+
+        // Init
+        window.addEventListener('load', () => {
+            loadDataTable();
+            loadDataFromLab7();
+        });
+    </script>
+</body>
+</html>

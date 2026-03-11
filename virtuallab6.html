@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prosedur Praktikum Hidrolisis Garam</title>
+
+<style>
+
+/* BODY */
+
+body{
+font-family:'Segoe UI', sans-serif;
+margin:0;
+background:linear-gradient(135deg,#eef3ff,#f7e9f3);
+min-height:100vh;
+color:#333;
+}
+
+/* HEADER */
+
+header{
+background:linear-gradient(90deg,#5f86c3,#b85b9c);
+color:white;
+padding:25px 20px;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:18px;
+}
+
+.logo{
+width:55px;
+height:55px;
+}
+
+.header-text{
+text-align:left;
+}
+
+.header-text h1{
+margin:0;
+font-size:28px;
+letter-spacing:1px;
+}
+
+.header-text h2{
+margin:4px 0 0 0;
+font-weight:400;
+font-size:16px;
+}
+
+/* NAV BUTTON */
+
+.nav{
+padding:20px 30px;
+}
+
+.back-btn{
+background:#2f6fb3;
+color:white;
+border:none;
+padding:10px 18px;
+border-radius:8px;
+cursor:pointer;
+font-size:14px;
+box-shadow:0 3px 6px rgba(0,0,0,0.2);
+transition:0.3s;
+}
+
+.back-btn:hover{
+background:#245a93;
+}
+
+/* MAIN CARD */
+
+.container{
+display:flex;
+justify-content:center;
+padding:10px 20px 40px 20px;
+}
+
+.card{
+background:#f4f4f4;
+border-radius:14px;
+padding:35px;
+max-width:900px;
+width:100%;
+box-shadow:0 6px 15px rgba(0,0,0,0.1);
+border-left:8px solid #4b6cb7;
+}
+
+.card h3{
+color:#2b4fa3;
+font-size:24px;
+margin-top:0;
+}
+
+/* STEPS */
+
+.steps{
+line-height:1.8;
+font-size:16px;
+}
+
+.steps ol{
+padding-left:20px;
+}
+
+.steps li{
+margin-bottom:8px;
+}
+
+/* INTERPRETASI */
+
+.interpretasi{
+margin-top:25px;
+background:#ffffff;
+padding:18px;
+border-radius:10px;
+border-left:5px solid #7f53ac;
+}
+
+.interpretasi h4{
+margin-top:0;
+color:#7f53ac;
+}
+
+/* VIDEO */
+
+.video-section{
+text-align:center;
+margin-top:30px;
+}
+
+.video-section video{
+width:80%;
+max-width:600px;
+border-radius:10px;
+box-shadow:0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* FOOTER */
+
+footer{
+display:flex;
+justify-content:center;
+padding:40px 20px;
+}
+
+.footer-card{
+background:linear-gradient(90deg,#5f86c3,#b85b9c);
+color:white;
+border-radius:12px;
+padding:25px 40px;
+text-align:center;
+width:95%;
+max-width:1300px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<img src="logoum.png" class="logo">
+
+<div class="header-text">
+<h1>UNIVERSITAS NEGERI MALANG</h1>
+<h2>Laboratorium Virtual Hidrolisis Garam</h2>
+</div>
+
+</header>
+
+<div class="nav">
+<button class="back-btn" onclick="location.href='virtuallab2.html'">
+← Kembali ke Dashboard
+</button>
+</div>
+
+<div class="container">
+<div class="card">
+
+<h3>Prosedur Praktikum Hidrolisis Garam</h3>
+
+<div class="steps">
+
+<h4>Tahap Persiapan dan Uji Lakmus</h4>
+
+<ol>
+<li>Ukur larutan garam sebanyak <b>20 mL</b> menggunakan gelas ukur.</li>
+<li>Pindahkan larutan tersebut ke dalam <b>erlenmeyer</b> yang bersih.</li>
+<li>Masukkan <b>kertas lakmus merah</b> ke dalam larutan dan amati perubahan warnanya.</li>
+<li>Masukkan <b>kertas lakmus biru</b> ke dalam larutan dan amati perubahan warna yang terjadi.</li>
+</ol>
+
+</div>
+
+<div class="interpretasi">
+
+<h4>Interpretasi</h4>
+
+<p>
+Perubahan warna kertas lakmus menunjukkan sifat larutan hasil hidrolisis garam:
+</p>
+
+<ul>
+<li>Jika <b>lakmus merah berubah menjadi biru</b>, maka larutan bersifat <b>basa</b>.</li>
+<li>Jika <b>lakmus biru berubah menjadi merah</b>, maka larutan bersifat <b>asam</b>.</li>
+<li>Jika <b>tidak terjadi perubahan warna</b>, maka larutan bersifat <b>netral</b>.</li>
+</ul>
+
+<p>
+Interpretasi ini membantu menghubungkan hasil observasi percobaan dengan konsep teori
+asam–basa dalam reaksi hidrolisis garam.
+</p>
+
+</div>
+
+<div class="steps">
+
+<h4>Pengukuran Kuantitatif pH</h4>
+
+<ol start="6">
+<li>Nyalakan <b>pH meter</b> dan pastikan elektroda dalam kondisi bersih.</li>
+<li>Masukkan elektroda pH meter ke dalam larutan garam.</li>
+<li>Tunggu hingga angka pH pada layar stabil.</li>
+<li>Catat nilai pH yang ditunjukkan oleh alat.</li>
+<li>Bilas elektroda menggunakan air suling sebelum digunakan kembali.</li>
+<li>Ulangi pengukuran untuk setiap larutan garam yang diuji.</li>
+</ol>
+
+</div>
+
+<!-- VIDEO -->
+
+<div class="video-section">
+
+<h4>Video Praktikum Hidrolisis Garam</h4>
+
+<video controls>
+<source src="videoplayback (1).mp4" type="video/mp4">
+Browser Anda tidak mendukung video.
+</video>
+
+</div>
+
+</div>
+</div>
+
+<footer>
+
+<div class="footer-card">
+
+<p>
+<b>Laboratorium Virtual Hidrolisis Garam</b><br>
+Jamila Fitrianingsih | Pendidikan Kimia<br>
+Universitas Negeri Malang<br>
+© 2026
+</p>
+
+</div>
+
+</footer>
+
+</body>
+</html>

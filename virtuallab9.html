@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Hidrolisis Garam</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e88e5 0%, #e91e63 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #5b8dd3, #c77ab5);
+            color: white;
+            padding: 25px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .header-logo {
+            width: 70px;
+            height: 70px;
+            flex-shrink: 0;
+        }
+
+        .header-text {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .header-text h1 {
+            font-size: 2em;
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .header-text p {
+            font-size: 1.1em;
+            margin: 0;
+            font-weight: 400;
+            opacity: 0.95;
+            padding-left: 35px;
+        }
+
+        footer {
+            background: linear-gradient(135deg, #5b8dd3, #c77ab5);
+            padding: 30px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        footer p {
+            margin: 5px 0;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+
+        footer p:first-child {
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .back-to-dashboard {
+            margin: 30px 40px 0;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: #4a7bb8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-back:hover {
+            background: #3a6ba8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .content-page {
+            padding: 40px;
+        }
+
+        h2 {
+            color: #1e88e5;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2em;
+        }
+
+        .quiz-question {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border-left: 5px solid #1e88e5;
+        }
+
+        .quiz-question h4 {
+            color: #1e88e5;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .image-box {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0 20px 0;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+        }
+
+        .image-box img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .image-box p {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .quiz-option {
+            padding: 15px 20px;
+            background: #f5f5f5;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .quiz-option:hover {
+            background: #e3f2fd;
+            border-color: #1e88e5;
+            transform: translateX(5px);
+        }
+
+        .quiz-option.selected {
+            background: #1e88e5;
+            color: white;
+            border-color: #1e88e5;
+        }
+
+        .quiz-option.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .quiz-option.incorrect {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1e88e5, #e91e63);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quiz-result {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .quiz-result h3 {
+            color: #1e88e5;
+            margin-bottom: 20px;
+        }
+
+        .quiz-score {
+            font-size: 3em;
+            color: #1e88e5;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+            z-index: 1000;
+            max-width: 400px;
+        }
+
+        .notification.success {
+            border-left: 5px solid #4caf50;
+        }
+
+        .notification.error {
+            border-left: 5px solid #f44336;
+        }
+
+        .notification.info {
+            border-left: 5px solid #1e88e5;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            
+            .content-page {
+                padding: 20px;
+            }
+
+            .quiz-question {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="logoum.png" alt="Logo UM" class="header-logo">
+            <div class="header-text">
+                <h1>UNIVERSITAS NEGERI MALANG</h1>
+                <p>Laboratorium Virtual Hidrolisis Garam</p>
+            </div>
+        </header>
+
+        <div class="back-to-dashboard">
+    <button class="btn-back" onclick="location.href='virtuallab2.html'">
+        ⬅ Kembali ke Dashboard
+    </button>
+</div>
+
+        <div class="content-page">
+            <h2>Quiz Hidrolisis Garam</h2>
+
+            <!-- IDENTITAS SISWA -->
+            <div style="background:#f9f9f9;padding:25px 30px;border-radius:15px;margin-bottom:25px;border-left:5px solid #e91e63;">
+                <h3 style="color:#e91e63;margin-bottom:15px;">📋 Identitas Siswa</h3>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;">
+                    <div>
+                        <label style="font-weight:600;color:#444;display:block;margin-bottom:6px;">Nama Lengkap</label>
+                        <input type="text" id="input-nama" placeholder="Masukkan nama lengkap..." style="width:100%;padding:10px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:1em;outline:none;">
+                    </div>
+                    <div>
+                        <label style="font-weight:600;color:#444;display:block;margin-bottom:6px;">Kelas</label>
+                        <input type="text" id="input-kelas" placeholder="Contoh: XI IPA 1" style="width:100%;padding:10px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:1em;outline:none;">
+                    </div>
+                    <div>
+                        <label style="font-weight:600;color:#444;display:block;margin-bottom:6px;">Nomor Absen</label>
+                        <input type="text" id="input-absen" placeholder="Contoh: 12" style="width:100%;padding:10px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:1em;outline:none;">
+                    </div>
+                </div>
+            </div>
+            
+            <div id="quiz-container"></div>
+            
+            <div style="text-align: center;">
+                <button class="btn" onclick="submitQuiz()" id="btn-submit-quiz">Submit Quiz</button>
+            </div>
+            
+            <div class="quiz-result hidden" id="quiz-result">
+                <h3>Hasil Quiz</h3>
+                <div class="quiz-score" id="quiz-score">0</div>
+                <p id="quiz-feedback"></p>
+                <button class="btn" onclick="resetQuiz()">Ulangi Quiz</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>Laboratorium Virtual Hidrolisis Garam</p>
+            <p>Jamila Fitrianingsih | Pendidikan Kimia</p>
+            <p>Universitas Negeri Malang</p>
+            <p>© 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        // Quiz Questions
+        const quizQuestions = [
+            {
+                question: "Garam yang mengalami hidrolisis total adalah...",
+                options: ["NaCl", "NH<sub>4</sub>Cl", "NH<sub>4</sub>CN", "CH<sub>3</sub>COONa"],
+                correct: 0  // Jawaban benar: NaCl (index 0)
+            },
+            {
+                question: "Larutan garam yang bersifat netral berasal dari...",
+                options: ["Asam kuat dan basa kuat", "Asam lemah dan basa kuat", "Asam kuat dan basa lemah", "Asam lemah dan basa lemah"],
+                correct: 0
+            },
+            {
+                question: "Larutan CH<sub>3</sub>COONa dalam air bersifat...",
+                options: ["Asam", "Basa", "Netral", "Amfoter"],
+                correct: 1
+            },
+            {
+                question: "Kantong penghangat tangan (<i>handwarmer</i>) sering menggunakan garam yang dapat menghasilkan panas saat dilarutkan dalam air. Garam manakah yang paling tepat digunakan sebagai bahan <i>handwarmer</i> karena proses hidrolisisnya bersifat eksotermik?",
+                image: "handwarmer.jpg",
+                options: [
+                    "CH<sub>3</sub>COONa (garam dari asam lemah dan basa kuat)",
+                    "NH<sub>4</sub>Cl (garam dari asam kuat dan basa lemah)",
+                    "NaCl (garam dari asam kuat dan basa kuat)",
+                    "CaCl<sub>2</sub> (garam dari asam kuat dan basa kuat)"
+                ],
+                correct: 0  // Jawaban benar: CH3COONa (index 0)
+            },
+            {
+                question: "Mengapa larutan garam dapur (NaCl) yang digunakan untuk memasak memiliki pH sekitar 7 dan tidak mengubah rasa asam atau basa pada masakan?",
+                image: "garam.jpg",
+                options: [
+                    "Karena NaCl berasal dari asam lemah dan basa lemah",
+                    "Karena NaCl berasal dari asam kuat (HCl) dan basa kuat (NaOH) sehingga tidak terhidrolisis",
+                    "Karena NaCl mengalami hidrolisis parsial yang saling meniadakan",
+                    "Karena konsentrasi NaCl dalam masakan terlalu rendah"
+                ],
+                correct: 1
+            },
+            {
+                question: "Pupuk ZA mengandung (NH<sub>4</sub>)<sub>2</sub>SO<sub>4</sub>. Jika pupuk ini dilarutkan dalam air untuk penyiraman tanaman, bagaimana pengaruhnya terhadap pH tanah?",
+                image: "pupuk.jpg",
+                options: [
+                    "pH tanah akan naik (menjadi basa) karena mengandung ion NH<sub>4</sub><sup>+</sup>",
+                    "pH tanah akan turun (menjadi asam) karena hidrolisis ion NH<sub>4</sub><sup>+</sup> menghasilkan H<sub>3</sub>O<sup>+</sup>",
+                    "pH tanah tetap netral karena (NH<sub>4</sub>)<sub>2</sub>SO<sub>4</sub> tidak terhidrolisis",
+                    "pH tanah akan naik karena ion SO<sub>4</sub><sup>2-</sup> bersifat basa"
+                ],
+                correct: 1
+            },
+            {
+                question: "Diketahui larutan CH<sub>3</sub>COONa 0,1 M dengan K<sub>a</sub> = 10<sup>-5</sup>. Berapakah pH larutan tersebut?",
+                options: [
+                    "pH = 9",
+                    "pH = 10", 
+                    "pH = 11",
+                    "pH = 12"
+                ],
+                correct: 0
+            },
+            {
+                question: "Larutan NH<sub>4</sub>Cl 0,01 M memiliki K<sub>b</sub> = 10<sup>-5</sup>. Hitunglah pH larutan!",
+                options: [
+                    "pH = 3,5",
+                    "pH = 4",
+                    "pH = 5",
+                    "pH = 5,5"
+                ],
+                correct: 2  // Jawaban benar: pH = 5 (index 2)
+            },
+            {
+                question: "Alat paling akurat untuk mengukur pH larutan adalah...",
+                options: ["Kertas lakmus", "Indikator universal", "pH meter", "Indikator pp"],
+                correct: 2
+            },
+            {
+                question: "Pernyataan yang benar tentang hidrolisis garam adalah...",
+                options: [
+                    "Semua garam mengalami hidrolisis dalam air",
+                    "Hidrolisis hanya terjadi pada garam dari asam lemah",
+                    "Garam dari asam kuat dan basa kuat tidak mengalami hidrolisis",
+                    "Hidrolisis selalu menghasilkan larutan bersifat asam"
+                ],
+                correct: 2
+            }
+        ];
+
+        let userAnswers = Array(10).fill(-1);
+
+        // Notification
+        function showNotification(msg, type) {
+            const notif = document.createElement('div');
+            notif.className = `notification ${type}`;
+            notif.innerHTML = `<strong>${type==='success'?'✓':type==='error'?'✗':'ℹ'}</strong> ${msg}`;
+            document.body.appendChild(notif);
+            
+            setTimeout(() => notif.remove(), 3000);
+        }
+
+        // Generate Quiz - FIXED: Menggunakan data attributes untuk menghindari masalah dengan HTML entity
+        function generateQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+            
+            quizQuestions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-question';
+                
+                // Build image HTML if exists
+                let imageHTML = '';
+                if (q.image) {
+                    imageHTML = `
+                        <div class="image-box">
+                            <img src="${q.image}" alt="Gambar Soal ${i+1}" onerror="this.parentElement.style.display='none'">
+                            <p>Gambar: ${q.image}</p>
+                        </div>
+                    `;
+                }
+                
+                // Build question HTML
+                let questionHTML = `<h4>${i+1}. ${q.question}</h4>${imageHTML}`;
+                
+                // Build options HTML with data attributes
+                let optionsHTML = '';
+                q.options.forEach((opt, j) => {
+                    optionsHTML += `
+                        <div class="quiz-option" data-qindex="${i}" data-oindex="${j}">
+                            ${String.fromCharCode(97+j)}. ${opt}
+                        </div>
+                    `;
+                });
+                
+                div.innerHTML = questionHTML + optionsHTML;
+                container.appendChild(div);
+            });
+            
+            // Attach event listeners ONCE after all questions are added
+            attachQuizEventListeners();
+        }
+
+        // Attach event listeners hanya sekali
+        function attachQuizEventListeners() {
+            const allOptions = document.querySelectorAll('.quiz-option');
+            
+            allOptions.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    
+                    const qIndex = parseInt(this.getAttribute('data-qindex'));
+                    const oIndex = parseInt(this.getAttribute('data-oindex'));
+                    
+                    selectAnswer(qIndex, oIndex);
+                }, { once: false, passive: false });
+            });
+        }
+
+        // PERBAIKAN: Fungsi selectAnswer yang lebih sederhana
+        function selectAnswer(qIndex, optIndex) {
+            // Jika quiz sudah disubmit, jangan bisa ubah jawaban
+            const submitBtn = document.getElementById('btn-submit-quiz');
+            if (submitBtn && submitBtn.disabled) {
+                return;
+            }
+            
+            // Set jawaban user
+            userAnswers[qIndex] = optIndex;
+            
+            // Update tampilan - hapus semua selected di question ini
+            const allQuestions = document.querySelectorAll('.quiz-question');
+            if (allQuestions[qIndex]) {
+                const options = allQuestions[qIndex].querySelectorAll('.quiz-option');
+                
+                options.forEach((opt, i) => {
+                    opt.classList.remove('selected');
+                    if (i === optIndex) {
+                        opt.classList.add('selected');
+                    }
+                });
+            }
+        }
+
+        function submitQuiz() {
+            // Validasi identitas
+            const nama  = document.getElementById('input-nama').value.trim();
+            const kelas = document.getElementById('input-kelas').value.trim();
+            const absen = document.getElementById('input-absen').value.trim();
+            if (!nama || !kelas || !absen) {
+                showNotification('Isi identitas siswa terlebih dahulu!', 'error');
+                return;
+            }
+
+            if (userAnswers.includes(-1)) {
+                showNotification('Jawab semua soal!', 'error');
+                return;
+            }
+            
+            let score = 0;
+            const detailJawabanQuiz = [];
+            
+            quizQuestions.forEach((q, i) => {
+                const question = document.querySelectorAll('.quiz-question')[i];
+                question.querySelectorAll('.quiz-option').forEach((opt, j) => {
+                    opt.classList.remove('selected');
+                    if (j === q.correct) opt.classList.add('correct');
+                    else if (j === userAnswers[i]) opt.classList.add('incorrect');
+                });
+                
+                const isCorrect = userAnswers[i] === q.correct;
+                if (isCorrect) score += 10;
+
+                detailJawabanQuiz.push({
+                    pertanyaan:   q.question,
+                    jawaban:      q.options[userAnswers[i]],
+                    jawabanBenar: q.options[q.correct],
+                    benar:        isCorrect
+                });
+            });
+            
+            document.getElementById('quiz-result').classList.remove('hidden');
+            document.getElementById('quiz-score').textContent = score;
+            document.getElementById('quiz-feedback').textContent =
+                `${score/10}/10 benar. ` + (score>=80 ? 'Luar biasa!' : score>=60 ? 'Bagus!' : 'Belajar lagi!');
+            
+            document.getElementById('btn-submit-quiz').disabled = true;
+
+            // Simpan ke localStorage → terbaca di virtuallab10
+            const dataToSave = {
+                nama:    nama,
+                kelas:   kelas,
+                absen:   absen,
+                nilaiQuiz: score,
+                tanggal:   new Date().toISOString(),
+                detailJawabanQuiz: detailJawabanQuiz
+            };
+            localStorage.setItem('quizScore_' + nama + '_' + kelas + '_' + absen, JSON.stringify(dataToSave));
+            
+            showNotification('Quiz selesai & tersimpan! Nilai: ' + score, 'success');
+        }
+
+        function resetQuiz() {
+            userAnswers = Array(10).fill(-1);
+            const resultDiv = document.getElementById('quiz-result');
+            const submitBtn = document.getElementById('btn-submit-quiz');
+            
+            if (resultDiv) resultDiv.classList.add('hidden');
+            if (submitBtn) submitBtn.disabled = false;
+            
+            generateQuiz();
+        }
+
+        // Init
+        window.addEventListener('load', () => {
+            generateQuiz();
+        });
+    </script>
+</body>
+</html>
