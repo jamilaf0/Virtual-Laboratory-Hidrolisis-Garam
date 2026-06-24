@@ -399,6 +399,57 @@
         </footer>
     </div>
 
+    <!-- ═══════════════════════════════════════════════════════════
+         FIREBASE — simpan nilai quiz ke cloud (real-time ke guru)
+         GANTI firebaseConfig di bawah dengan config milikmu
+    ════════════════════════════════════════════════════════════ -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, deleteDoc, doc }
+            from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        // ╔══════════════════════════════════════════════════════╗
+        // ║  GANTI DENGAN CONFIG FIREBASE-MU (sama dengan guru) ║
+        // ╚══════════════════════════════════════════════════════╝
+        const firebaseConfig = {
+            apiKey:            "GANTI_API_KEY",
+            authDomain:        "GANTI_PROJECT_ID.firebaseapp.com",
+            projectId:         "GANTI_PROJECT_ID",
+            storageBucket:     "GANTI_PROJECT_ID.appspot.com",
+            messagingSenderId: "GANTI_SENDER_ID",
+            appId:             "GANTI_APP_ID"
+        };
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            const db  = getFirestore(app);
+
+            window.saveQuizToFirebase = async function(dataScore) {
+                try {
+                    const col = collection(db, 'nilaiQuiz');
+                    // Hapus data lama siswa yang sama agar tidak duplikat
+                    const q    = query(col,
+                        where('nama',  '==', dataScore.nama),
+                        where('kelas', '==', dataScore.kelas),
+                        where('absen', '==', dataScore.absen)
+                    );
+                    const snap = await getDocs(q);
+                    const dels = [];
+                    snap.forEach(d => dels.push(deleteDoc(doc(db, 'nilaiQuiz', d.id))));
+                    await Promise.all(dels);
+                    // Simpan data baru
+                    await addDoc(col, { ...dataScore, _savedAt: new Date().toISOString() });
+                    console.log('[Firebase] Nilai quiz tersimpan:', dataScore.nama);
+                } catch(e) {
+                    console.warn('[Firebase] Gagal simpan quiz:', e.message);
+                }
+            };
+        } catch(e) {
+            console.warn('[Firebase] Init gagal:', e.message);
+            window.saveQuizToFirebase = null;
+        }
+    </script>
+
     <script>
         // ============================================================
         // DATA SOAL — 10 soal berbasis hasil praktikum + stimulus
@@ -571,10 +622,8 @@
                 const div = document.createElement('div');
                 div.className = 'quiz-question';
 
-                // Stimulus
                 let stimulusHTML = `<div class="stimulus-box"><p>${q.stimulus}</p></div>`;
 
-                // Image (optional)
                 let imageHTML = '';
                 if (q.image) {
                     imageHTML = `
@@ -584,13 +633,11 @@
                         </div>`;
                 }
 
-                // Question label + text
                 let questionHTML = `
                     <span class="question-label">Soal ${i+1}</span>
                     <h4>${q.question}</h4>
                     ${imageHTML}`;
 
-                // Options
                 let optionsHTML = '';
                 q.options.forEach((opt, j) => {
                     optionsHTML += `
@@ -679,7 +726,14 @@
                 tanggal: new Date().toISOString(),
                 detailJawabanQuiz
             };
+
+            // ── Simpan ke localStorage (tetap seperti semula) ──
             localStorage.setItem('quizScore_' + nama + '_' + kelas + '_' + absen, JSON.stringify(dataToSave));
+
+            // ── TAMBAHAN: Simpan ke Firebase agar terbaca di rekapan guru ──
+            if (typeof window.saveQuizToFirebase === 'function') {
+                window.saveQuizToFirebase(dataToSave);
+            }
 
             showNotification('Quiz selesai & tersimpan! Nilai: ' + score, 'success');
         }
