@@ -20,6 +20,118 @@
             padding: 20px;
         }
 
+        /* ─── PASSWORD GATE ─────────────────────────────────── */
+        #password-gate {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #1e88e5 0%, #e91e63 100%);
+            z-index: 99999;
+        }
+
+        .password-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.35);
+            padding: 50px 40px 40px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .password-card .lock-icon {
+            font-size: 3.5em;
+            margin-bottom: 10px;
+        }
+
+        .password-card h2 {
+            color: #1e88e5;
+            font-size: 1.6em;
+            margin-bottom: 6px;
+        }
+
+        .password-card p {
+            color: #777;
+            font-size: 0.95em;
+            margin-bottom: 30px;
+        }
+
+        .password-input-wrap {
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .password-input-wrap input {
+            width: 100%;
+            padding: 14px 50px 14px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1.05em;
+            outline: none;
+            transition: border-color 0.3s;
+            letter-spacing: 2px;
+        }
+
+        .password-input-wrap input:focus {
+            border-color: #1e88e5;
+        }
+
+        .password-input-wrap input.error {
+            border-color: #f44336;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%,100%{ transform:translateX(0); }
+            20%{ transform:translateX(-8px); }
+            40%{ transform:translateX(8px); }
+            60%{ transform:translateX(-6px); }
+            80%{ transform:translateX(6px); }
+        }
+
+        .toggle-pw {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            color: #999;
+        }
+
+        .pw-error-msg {
+            color: #f44336;
+            font-size: 0.88em;
+            margin-bottom: 14px;
+            min-height: 18px;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #1e88e5, #e91e63);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.05em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-login:hover {
+            opacity: 0.92;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+        }
+        /* ─── END PASSWORD GATE ─────────────────────────────── */
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -27,6 +139,7 @@
             border-radius: 20px;
             box-shadow: 0 10px 50px rgba(0,0,0,0.3);
             overflow: hidden;
+            display: none; /* hidden until password OK */
         }
 
         header {
@@ -281,6 +394,36 @@
             margin: 40px 0;
         }
 
+        /* Real-time indicator */
+        .realtime-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.82em;
+            font-weight: 600;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        .realtime-dot {
+            width: 8px;
+            height: 8px;
+            background: #4caf50;
+            border-radius: 50%;
+            animation: pulse-dot 1.5s infinite;
+            display: inline-block;
+        }
+
+        @keyframes pulse-dot {
+            0%,100% { opacity: 1; transform: scale(1); }
+            50%      { opacity: 0.4; transform: scale(0.7); }
+        }
+
         footer {
             background: linear-gradient(135deg, #5b8dd3, #c77ab5);
             padding: 30px 20px;
@@ -363,11 +506,33 @@
             .data-table { font-size: 0.85em; }
             .data-table th, .data-table td { padding: 8px; }
             .section-header { flex-direction: column; align-items: flex-start; }
+            .password-card { padding: 40px 24px 32px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+
+    <!-- ═══════════════════════════════════════════════════════
+         PASSWORD GATE
+    ════════════════════════════════════════════════════════ -->
+    <div id="password-gate">
+        <div class="password-card">
+            <div class="lock-icon">🔐</div>
+            <h2>Rekapan Nilai</h2>
+            <p>Masukkan kata sandi untuk mengakses halaman ini</p>
+            <div class="password-input-wrap">
+                <input type="password" id="pw-input" placeholder="Kata sandi..." onkeydown="if(event.key==='Enter') checkPassword()">
+                <button class="toggle-pw" onclick="togglePwVisibility()" title="Tampilkan/sembunyikan">👁</button>
+            </div>
+            <div class="pw-error-msg" id="pw-error"></div>
+            <button class="btn-login" onclick="checkPassword()">🔓 Masuk</button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         MAIN CONTENT (hidden until password OK)
+    ════════════════════════════════════════════════════════ -->
+    <div class="container" id="main-container">
         <header>
             <img src="logoum.png" alt="Logo UM" class="header-logo">
             <div class="header-text">
@@ -377,7 +542,12 @@
         </header>
 
         <div class="content-box">
-            <h2>Rekapan Nilai Praktikum</h2>
+            <h2>
+                Rekapan Nilai Praktikum
+                <span class="realtime-badge">
+                    <span class="realtime-dot"></span> Real-time
+                </span>
+            </h2>
 
             <!-- Filter & Reset bersama -->
             <div class="recap-controls">
@@ -475,7 +645,34 @@
     </div>
 
     <script>
-        // ─── Notification ────────────────────────────────────────────────────────────
+        // ─── PASSWORD GATE ─────────────────────────────────────────────────────────
+        const CORRECT_PASSWORD = 'jamila_27';
+
+        function checkPassword() {
+            const input = document.getElementById('pw-input');
+            const errEl = document.getElementById('pw-error');
+            if (input.value === CORRECT_PASSWORD) {
+                document.getElementById('password-gate').style.display = 'none';
+                document.getElementById('main-container').style.display = 'block';
+                loadAllTables();
+            } else {
+                errEl.textContent = '❌ Kata sandi salah. Coba lagi.';
+                input.classList.add('error');
+                input.value = '';
+                setTimeout(() => {
+                    input.classList.remove('error');
+                    errEl.textContent = '';
+                }, 2000);
+                input.focus();
+            }
+        }
+
+        function togglePwVisibility() {
+            const inp = document.getElementById('pw-input');
+            inp.type = inp.type === 'password' ? 'text' : 'password';
+        }
+
+        // ─── Notification ─────────────────────────────────────────────────────────
         function showNotification(msg, type) {
             const notif = document.createElement('div');
             notif.className = `notification ${type}`;
@@ -484,7 +681,7 @@
             setTimeout(() => notif.remove(), 3000);
         }
 
-        // ─── Tab Switch ───────────────────────────────────────────────────────────────
+        // ─── Tab Switch ──────────────────────────────────────────────────────────
         function switchTab(panelId, btn) {
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -492,7 +689,7 @@
             btn.classList.add('active');
         }
 
-        // ─── Load Data dari localStorage ─────────────────────────────────────────────
+        // ─── Load Data dari localStorage ─────────────────────────────────────────
         function getAllData() {
             const praktikumMap = {};
             const quizMap     = {};
@@ -504,7 +701,6 @@
                 if (key.startsWith('dataScore_')) {
                     const data = JSON.parse(localStorage.getItem(key));
                     const uk   = `${data.nama}__${data.kelas}__${data.absen}`;
-                    // Simpan nilai tertinggi per user
                     if (!praktikumMap[uk] || (data.nilaiPraktikum || 0) > praktikumMap[uk].nilaiPraktikum) {
                         praktikumMap[uk] = data;
                     }
@@ -582,7 +778,34 @@
             });
         }
 
-        // ─── Filter ─────────────────────────────────────────────────────────────────
+        // ─── REAL-TIME SYNC ───────────────────────────────────────────────────────
+        // Mendengarkan perubahan localStorage dari tab/jendela lain
+        window.addEventListener('storage', function(e) {
+            if (e.key && (e.key.startsWith('dataScore_') || e.key.startsWith('quizScore_'))) {
+                loadAllTables();
+                applyFilters();
+                showNotification('🔄 Data baru masuk secara real-time!', 'info');
+            }
+        });
+
+        // Polling fallback untuk tab yang sama origin (misal siswa & guru di domain sama)
+        // Setiap 3 detik cek apakah ada perubahan di localStorage
+        let _lastCount = 0;
+        setInterval(function() {
+            let count = 0;
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k && (k.startsWith('dataScore_') || k.startsWith('quizScore_'))) count++;
+            }
+            if (count !== _lastCount) {
+                _lastCount = count;
+                loadAllTables();
+                applyFilters();
+                if (count > 0) showNotification('🔄 Data diperbarui secara real-time!', 'info');
+            }
+        }, 3000);
+
+        // ─── Filter ──────────────────────────────────────────────────────────────
         function applyFilters() {
             const nama  = document.getElementById('filter-nama').value.toLowerCase();
             const kelas = document.getElementById('filter-kelas').value.toLowerCase();
@@ -598,7 +821,7 @@
             renderQuizTable(fq);
         }
 
-        // ─── View Detail Praktikum ────────────────────────────────────────────────────
+        // ─── View Detail Praktikum ────────────────────────────────────────────────
         function viewDetailPraktikum(p) {
             let html = '<div style="max-width:900px;margin:0 auto;">';
             html += '<h2 style="color:#1e88e5;margin-bottom:20px;text-align:center;">📊 Detail Hasil Praktikum</h2>';
@@ -645,7 +868,7 @@
             document.getElementById('detail-modal').style.display = 'block';
         }
 
-        // ─── View Detail Quiz ──────────────────────────────────────────────────────
+        // ─── View Detail Quiz ─────────────────────────────────────────────────────
         function viewDetailQuiz(q) {
             let html = '<div style="max-width:900px;margin:0 auto;">';
             html += '<h2 style="color:#e91e63;margin-bottom:20px;text-align:center;">✏️ Detail Jawaban Quiz</h2>';
@@ -683,12 +906,11 @@
             if (e.target === this) closeModal();
         });
 
-        // ─── Download Excel ────────────────────────────────────────────────────────
+        // ─── Download Excel ───────────────────────────────────────────────────────
         function downloadExcel(type) {
             const wb = XLSX.utils.book_new();
 
             if (type === 'praktikum' || type === 'semua') {
-                // Sheet utama: rekap nilai
                 const pRows = _praktikumData.map((d, i) => ({
                     'No'              : i + 1,
                     'Nama'            : d.nama,
@@ -703,7 +925,6 @@
                 ];
                 XLSX.utils.book_append_sheet(wb, wsP, 'Rekap Praktikum');
 
-                // Sheet detail jawaban praktikum
                 const detailRows = [];
                 _praktikumData.forEach(d => {
                     if (d.detailJawaban && d.detailJawaban.length > 0) {
@@ -752,7 +973,6 @@
             }
 
             if (type === 'quiz') {
-                // Sheet utama: rekap nilai quiz
                 const qRows = _quizData.map((d, i) => ({
                     'No'         : i + 1,
                     'Nama'       : d.nama,
@@ -765,7 +985,6 @@
                 wsQ['!cols'] = [{wch:5},{wch:25},{wch:15},{wch:8},{wch:12},{wch:22}];
                 XLSX.utils.book_append_sheet(wb, wsQ, 'Rekap Quiz');
 
-                // Sheet detail jawaban quiz
                 const quizDetailRows = [];
                 _quizData.forEach(d => {
                     if (d.detailJawabanQuiz && d.detailJawabanQuiz.length > 0) {
@@ -823,6 +1042,7 @@
                     try { localStorage.removeItem(key); deleted++; }
                     catch { failed++; }
                 });
+                _lastCount = 0;
                 loadAllTables();
                 if (failed === 0) {
                     alert(`✅ RESET BERHASIL!\n\n📊 Total data terhapus: ${deleted}`);
@@ -840,8 +1060,9 @@
         // ─── Init ─────────────────────────────────────────────────────────────────
         document.getElementById('btn-reset-data').addEventListener('click', resetAllData);
 
+        // Fokus otomatis ke input password saat halaman dibuka
         window.addEventListener('load', () => {
-            loadAllTables();
+            document.getElementById('pw-input').focus();
         });
     </script>
 </body>
