@@ -292,10 +292,10 @@
         </header>
 
         <div class="back-to-dashboard">
-    <button class="btn-back" onclick="location.href='virtuallab2.html'">
-        ⬅ Kembali ke Dashboard
-    </button>
-</div>
+            <button class="btn-back" onclick="location.href='virtuallab2.html'">
+                ⬅ Kembali ke Dashboard
+            </button>
+        </div>
 
         <div class="content-page">
             <!-- IDENTITAS SISWA -->
@@ -358,6 +358,57 @@
         </footer>
     </div>
 
+    <!-- ═══════════════════════════════════════════════════════════════
+         FIREBASE — simpan nilai praktikum ke cloud (real-time ke guru)
+         GANTI firebaseConfig di bawah dengan config milikmu
+    ════════════════════════════════════════════════════════════════ -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, deleteDoc, doc }
+            from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        // ╔══════════════════════════════════════════════════════╗
+        // ║  GANTI DENGAN CONFIG FIREBASE-MU (sama dengan guru) ║
+        // ╚══════════════════════════════════════════════════════╝
+        const firebaseConfig = {
+            apiKey:            "GANTI_API_KEY",
+            authDomain:        "GANTI_PROJECT_ID.firebaseapp.com",
+            projectId:         "GANTI_PROJECT_ID",
+            storageBucket:     "GANTI_PROJECT_ID.appspot.com",
+            messagingSenderId: "GANTI_SENDER_ID",
+            appId:             "GANTI_APP_ID"
+        };
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            const db  = getFirestore(app);
+
+            window.savePraktikumToFirebase = async function(dataScore) {
+                try {
+                    const col = collection(db, 'nilaiPraktikum');
+                    // Hapus data lama siswa yang sama agar tidak duplikat
+                    const q    = query(col,
+                        where('nama',  '==', dataScore.nama),
+                        where('kelas', '==', dataScore.kelas),
+                        where('absen', '==', dataScore.absen)
+                    );
+                    const snap = await getDocs(q);
+                    const dels = [];
+                    snap.forEach(d => dels.push(deleteDoc(doc(db, 'nilaiPraktikum', d.id))));
+                    await Promise.all(dels);
+                    // Simpan data baru
+                    await addDoc(col, { ...dataScore, _savedAt: new Date().toISOString() });
+                    console.log('[Firebase] Nilai praktikum tersimpan:', dataScore.nama);
+                } catch(e) {
+                    console.warn('[Firebase] Gagal simpan praktikum:', e.message);
+                }
+            };
+        } catch(e) {
+            console.warn('[Firebase] Init gagal:', e.message);
+            window.savePraktikumToFirebase = null;
+        }
+    </script>
+
     <script>
         // Solutions data
         const solutions = {
@@ -404,7 +455,6 @@
             notif.className = `notification ${type}`;
             notif.innerHTML = `<strong>${type==='success'?'✓':type==='error'?'✗':'ℹ'}</strong> ${msg}`;
             document.body.appendChild(notif);
-            
             setTimeout(() => notif.remove(), 3000);
         }
 
@@ -413,7 +463,7 @@
             const tbody = document.getElementById('data-table-body');
             tbody.innerHTML = '';
             
-            const solutionList = ['(NH4)2SO4', 'NaCl', 'CH3COONa', 'NH4CH3COO', 'Na2SO4'];
+            const solutionList  = ['(NH4)2SO4', 'NaCl', 'CH3COONa', 'NH4CH3COO', 'Na2SO4'];
             const solutionNames = ['(NH<sub>4</sub>)<sub>2</sub>SO<sub>4</sub>', 'NaCl', 'CH<sub>3</sub>COONa', 'NH<sub>4</sub>CH<sub>3</sub>COO', 'Na<sub>2</sub>SO<sub>4</sub>'];
             
             solutionList.forEach((sol, i) => {
@@ -469,17 +519,17 @@
             }
 
             const solutionList = ['(NH4)2SO4', 'NaCl', 'CH3COONa', 'NH4CH3COO', 'Na2SO4'];
-            let score = 0;
+            let score   = 0;
             let correct = 0;
             
             // Validasi semua field terisi
             let allFilled = true;
             solutionList.forEach((sol, i) => {
-                const red   = document.getElementById(`red${i}`).value;
-                const blue  = document.getElementById(`blue${i}`).value;
-                const ph    = document.getElementById(`ph${i}`).value;
+                const red    = document.getElementById(`red${i}`).value;
+                const blue   = document.getElementById(`blue${i}`).value;
+                const ph     = document.getElementById(`ph${i}`).value;
                 const nature = document.getElementById(`nature${i}`).value;
-                const hydro = document.getElementById(`hydro${i}`).value;
+                const hydro  = document.getElementById(`hydro${i}`).value;
                 if (!red || !blue || !ph || !nature || !hydro) allFilled = false;
             });
             
@@ -497,11 +547,11 @@
             // Check answers & build detailJawaban
             const detailJawaban = [];
             solutionList.forEach((sol, i) => {
-                const red   = document.getElementById(`red${i}`).value;
-                const blue  = document.getElementById(`blue${i}`).value;
-                const ph    = parseFloat(document.getElementById(`ph${i}`).value);
+                const red    = document.getElementById(`red${i}`).value;
+                const blue   = document.getElementById(`blue${i}`).value;
+                const ph     = parseFloat(document.getElementById(`ph${i}`).value);
                 const nature = document.getElementById(`nature${i}`).value;
-                const hydro = document.getElementById(`hydro${i}`).value;
+                const hydro  = document.getElementById(`hydro${i}`).value;
                 
                 const ans    = solutions[sol];
                 const status = document.getElementById(`status${i}`);
@@ -510,43 +560,49 @@
                                   Math.abs(ph-ans.ph)<0.5 && nature===ans.nature && hydro===ans.hydrolysis;
                 
                 if (isCorrect) { score += 20; correct++; status.innerHTML = '<span class="status-correct">✓</span>'; }
-                else { status.innerHTML = '<span class="status-incorrect">✗</span>'; }
+                else           { status.innerHTML = '<span class="status-incorrect">✗</span>'; }
 
                 detailJawaban.push({
-                    larutan: sol,
+                    larutan:     sol,
                     lakmusMerah: red,
                     lakmusBiru:  blue,
-                    pH:    ph,
-                    sifat: nature,
-                    hidrolisis: hydro,
-                    benar: isCorrect,
+                    pH:          ph,
+                    sifat:       nature,
+                    hidrolisis:  hydro,
+                    benar:       isCorrect,
                     jawabanYangBenar: {
                         lakmusMerah: ans.redLitmus,
                         lakmusBiru:  ans.blueLitmus,
-                        pH:    ans.ph,
-                        sifat: ans.nature,
-                        hidrolisis: ans.hydrolysis
+                        pH:          ans.ph,
+                        sifat:       ans.nature,
+                        hidrolisis:  ans.hydrolysis
                     }
                 });
             });
             
             document.getElementById('score-display').classList.remove('hidden');
-            document.getElementById('data-score').textContent = score;
+            document.getElementById('data-score').textContent  = score;
             document.getElementById('data-feedback').textContent =
                 `${correct}/5 benar. ` + (score>=80 ? 'Sangat Baik!' : score>=60 ? 'Baik!' : 'Perlu perbaikan.');
 
-            // Simpan ke localStorage → terbaca di virtuallab10
             const dataToSave = {
-                nama:    nama,
-                kelas:   kelas,
-                absen:   absen,
+                nama:           nama,
+                kelas:          kelas,
+                absen:          absen,
                 nilaiPraktikum: score,
-                tanggal: new Date().toISOString(),
-                kesimpulan: conclusion,
-                detailJawaban: detailJawaban
+                tanggal:        new Date().toISOString(),
+                kesimpulan:     conclusion,
+                detailJawaban:  detailJawaban
             };
+
+            // ── Simpan ke localStorage (tetap seperti semula) ──
             localStorage.setItem('dataScore_' + nama + '_' + kelas + '_' + absen, JSON.stringify(dataToSave));
-            
+
+            // ── TAMBAHAN: Simpan ke Firebase agar terbaca di rekapan guru ──
+            if (typeof window.savePraktikumToFirebase === 'function') {
+                window.savePraktikumToFirebase(dataToSave);
+            }
+
             showNotification('Data tersubmit & tersimpan! Nilai: ' + score, 'success');
         }
 
@@ -555,7 +611,7 @@
             const raw = localStorage.getItem('labData_virtuallab7');
             if (!raw) return;
 
-            const labData = JSON.parse(raw);
+            const labData    = JSON.parse(raw);
             const solutionList = ['(NH4)2SO4', 'NaCl', 'CH3COONa', 'NH4CH3COO', 'Na2SO4'];
 
             labData.forEach(item => {
