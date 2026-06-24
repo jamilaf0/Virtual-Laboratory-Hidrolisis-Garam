@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rekapan Nilai - Hidrolisis Garam</title>
+    <!-- SheetJS untuk export Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -73,16 +75,92 @@
             font-size: 2em;
         }
 
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #e0e0e0;
+        }
+
+        .tab-btn {
+            padding: 12px 28px;
+            background: #f5f5f5;
+            color: #666;
+            border: none;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+            bottom: -3px;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #1e88e5, #e91e63);
+            color: white;
+            border-bottom: 3px solid white;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #e3f2fd;
+            color: #1e88e5;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* Section header dengan tombol unduh */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .section-header h3 {
+            font-size: 1.4em;
+            color: #1e88e5;
+        }
+
+        .btn-download-excel {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #43a047, #1b5e20);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-download-excel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
+
         .recap-controls {
             display: flex;
             gap: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
         }
 
         .recap-controls input {
             flex: 1;
-            min-width: 200px;
+            min-width: 180px;
             padding: 12px 15px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
@@ -118,7 +196,7 @@
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            margin: 10px 0 20px;
             box-shadow: 0 3px 10px rgba(0,0,0,0.1);
             border-radius: 10px;
             overflow: hidden;
@@ -150,17 +228,15 @@
             transform: scale(1.01);
         }
 
-        .nilai-tinggi {
-            background: #e8f5e9;
-        }
+        /* Warna tabel praktikum */
+        .nilai-tinggi { background: #e8f5e9; }
+        .nilai-sedang { background: #fff9c4; }
+        .nilai-rendah { background: #ffebee; }
 
-        .nilai-sedang {
-            background: #fff9c4;
-        }
-
-        .nilai-rendah {
-            background: #ffebee;
-        }
+        /* Warna tabel quiz (biru muda aksen) */
+        .quiz-tinggi { background: #e3f2fd; }
+        .quiz-sedang { background: #fff9c4; }
+        .quiz-rendah { background: #fce4ec; }
 
         .action-btn {
             padding: 8px 16px;
@@ -198,6 +274,13 @@
             font-size: 0.95em;
         }
 
+        /* Divider antar section */
+        .section-divider {
+            border: none;
+            border-top: 2px dashed #e0e0e0;
+            margin: 40px 0;
+        }
+
         footer {
             background: linear-gradient(135deg, #5b8dd3, #c77ab5);
             padding: 30px 20px;
@@ -223,26 +306,15 @@
             max-width: 400px;
         }
 
-        .notification.success {
-            border-left: 5px solid #4caf50;
-        }
+        .notification.success { border-left: 5px solid #4caf50; }
+        .notification.error   { border-left: 5px solid #f44336; }
+        .notification.info    { border-left: 5px solid #1e88e5; }
 
-        .notification.error {
-            border-left: 5px solid #f44336;
-        }
-
-        .notification.info {
-            border-left: 5px solid #1e88e5;
-        }
-
-        /* Modal Styles */
+        /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.8);
             z-index: 9999;
             overflow-y: auto;
@@ -261,180 +333,40 @@
 
         .modal-close {
             position: absolute;
-            top: 15px;
-            right: 15px;
+            top: 15px; right: 15px;
             background: #f44336;
             color: white;
             border: none;
             border-radius: 50%;
-            width: 35px;
-            height: 35px;
+            width: 35px; height: 35px;
             cursor: pointer;
             font-size: 20px;
             font-weight: bold;
         }
 
-        .modal-close:hover {
-            background: #d32f2f;
-        }
+        .modal-close:hover { background: #d32f2f; }
 
-        /* Back Button */
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #1e88e5, #1565c0);
+        /* Badge jumlah data */
+        .badge {
+            display: inline-block;
+            background: #e91e63;
             color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 700;
-            text-decoration: none;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(30,136,229,0.35);
-        }
-
-        .back-btn:hover {
-            background: linear-gradient(135deg, #1565c0, #0d47a1);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(30,136,229,0.45);
-        }
-
-        .back-btn-wrapper {
-            padding: 15px 40px 0 40px;
-        }
-
-        /* Password Overlay */
-        .password-overlay {
-            display: flex;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, #1e88e5 0%, #e91e63 100%);
-            z-index: 99999;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .password-box {
-            background: white;
             border-radius: 20px;
-            padding: 50px 45px;
-            max-width: 420px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-        }
-
-        .password-box .lock-icon {
-            font-size: 3.5em;
-            margin-bottom: 15px;
-        }
-
-        .password-box h2 {
-            color: #1e88e5;
-            margin-bottom: 8px;
-            font-size: 1.6em;
-        }
-
-        .password-box p {
-            color: #777;
-            margin-bottom: 25px;
-            font-size: 0.95em;
-        }
-
-        .password-box input {
-            width: 100%;
-            padding: 14px 18px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1.1em;
-            text-align: center;
-            letter-spacing: 3px;
-            margin-bottom: 15px;
-            transition: border-color 0.3s;
-            outline: none;
-        }
-
-        .password-box input:focus {
-            border-color: #1e88e5;
-        }
-
-        .password-box input.shake {
-            animation: shake 0.4s ease;
-            border-color: #f44336;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-8px); }
-            40% { transform: translateX(8px); }
-            60% { transform: translateX(-6px); }
-            80% { transform: translateX(6px); }
-        }
-
-        .password-box .btn-masuk {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #1e88e5, #e91e63);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1em;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .password-box .btn-masuk:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-        }
-
-        .password-box .error-msg {
-            color: #f44336;
-            font-size: 0.9em;
-            margin-top: 10px;
-            min-height: 20px;
-            font-weight: 600;
+            padding: 2px 10px;
+            font-size: 0.85em;
+            margin-left: 8px;
         }
 
         @media (max-width: 768px) {
-            .content-box {
-                padding: 20px;
-            }
-
-            .recap-controls {
-                flex-direction: column;
-            }
-
-            .data-table {
-                font-size: 0.85em;
-            }
-
-            .data-table th,
-            .data-table td {
-                padding: 8px;
-            }
+            .content-box { padding: 20px; }
+            .recap-controls { flex-direction: column; }
+            .data-table { font-size: 0.85em; }
+            .data-table th, .data-table td { padding: 8px; }
+            .section-header { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
 <body>
-    <!-- Password Overlay -->
-    <div class="password-overlay" id="password-overlay">
-        <div class="password-box">
-            <div class="lock-icon">🔐</div>
-            <h2>Akses Rekapan Nilai</h2>
-            <p>Halaman ini hanya untuk guru/admin.<br>Masukkan password untuk melanjutkan.</p>
-            <input type="password" id="password-input" placeholder="Masukkan password..." 
-                   onkeydown="if(event.key==='Enter') checkPassword()">
-            <button class="btn-masuk" onclick="checkPassword()">🔓 Masuk</button>
-            <div class="error-msg" id="error-msg"></div>
-        </div>
-    </div>
-
     <div class="container">
         <header>
             <img src="logoum.png" alt="Logo UM" class="header-logo">
@@ -444,44 +376,88 @@
             </div>
         </header>
 
-        <div class="back-btn-wrapper">
-            <button class="back-btn" onclick="window.location.href='virtuallab2.html'">&#8592; Kembali ke Dashboard</button>
-        </div>
-
         <div class="content-box">
             <h2>Rekapan Nilai Praktikum</h2>
-            
+
+            <!-- Filter & Reset bersama -->
             <div class="recap-controls">
-                <input type="text" id="filter-nama" placeholder="Cari berdasarkan nama..." oninput="filterRecap()">
-                <input type="text" id="filter-kelas" placeholder="Cari berdasarkan kelas..." oninput="filterRecap()">
-                <button onclick="filterRecap()">🔍 Filter</button>
+                <input type="text" id="filter-nama" placeholder="Cari berdasarkan nama..." oninput="applyFilters()">
+                <input type="text" id="filter-kelas" placeholder="Cari berdasarkan kelas..." oninput="applyFilters()">
+                <button onclick="applyFilters()">🔍 Filter</button>
                 <button class="btn-reset" id="btn-reset-data">🔄 Reset Semua Data</button>
             </div>
-            
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Nama</th>
-                        <th>Kelas</th>
-                        <th>Absen</th>
-                        <th>Nilai Praktikum</th>
-                        <th>Nilai Quiz</th>
-                        <th>Nilai Akhir</th>
-                        <th>Tanggal</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="recap-table-body"></tbody>
-            </table>
-            
-            <div class="keterangan-box">
-                <h4>Keterangan:</h4>
-                <p>🟢 Hijau: Nilai ≥ 80 (Sangat Baik)</p>
-                <p>🟡 Kuning: Nilai 60-79 (Baik)</p>
-                <p>🔴 Merah: Nilai < 60 (Perlu Perbaikan)</p>
-                <p><strong>Nilai Akhir = (Nilai Praktikum + Nilai Quiz) ÷ 2</strong></p>
+
+            <!-- Tab Navigation -->
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="switchTab('tab-praktikum', this)">
+                    📊 Nilai Praktikum <span class="badge" id="badge-praktikum">0</span>
+                </button>
+                <button class="tab-btn" onclick="switchTab('tab-quiz', this)">
+                    ✏️ Nilai Quiz <span class="badge" id="badge-quiz">0</span>
+                </button>
             </div>
-        </div>
+
+            <!-- Tab: Nilai Praktikum -->
+            <div class="tab-panel active" id="tab-praktikum">
+                <div class="section-header">
+                    <h3>📊 Tabel Nilai Praktikum</h3>
+                    <button class="btn-download-excel" onclick="downloadExcel('praktikum')">
+                        ⬇️ Unduh Excel Praktikum
+                    </button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>Kelas</th>
+                            <th>Absen</th>
+                            <th>Nilai Praktikum</th>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-praktikum"></tbody>
+                </table>
+                <div class="keterangan-box">
+                    <h4>Keterangan Nilai Praktikum:</h4>
+                    <p>🟢 Hijau: Nilai ≥ 80 (Sangat Baik)</p>
+                    <p>🟡 Kuning: Nilai 60–79 (Baik)</p>
+                    <p>🔴 Merah: Nilai &lt; 60 (Perlu Perbaikan)</p>
+                </div>
+            </div>
+
+            <!-- Tab: Nilai Quiz -->
+            <div class="tab-panel" id="tab-quiz">
+                <div class="section-header">
+                    <h3>✏️ Tabel Nilai Quiz</h3>
+                    <button class="btn-download-excel" onclick="downloadExcel('quiz')">
+                        ⬇️ Unduh Excel Quiz
+                    </button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>Kelas</th>
+                            <th>Absen</th>
+                            <th>Nilai Quiz</th>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-quiz"></tbody>
+                </table>
+                <div class="keterangan-box" style="border-left-color: #e91e63;">
+                    <h4 style="color:#e91e63;">Keterangan Nilai Quiz:</h4>
+                    <p>🔵 Biru: Nilai ≥ 80 (Sangat Baik)</p>
+                    <p>🟡 Kuning: Nilai 60–79 (Baik)</p>
+                    <p>🩷 Pink: Nilai &lt; 60 (Perlu Perbaikan)</p>
+                </div>
+            </div>
+
+        </div><!-- .content-box -->
 
         <footer>
             <p><strong>Dibuat oleh: Jamila Fitrianingsih</strong></p>
@@ -490,7 +466,7 @@
         </footer>
     </div>
 
-    <!-- Modal for Details -->
+    <!-- Modal Detail -->
     <div class="modal-overlay" id="detail-modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal()">×</button>
@@ -499,28 +475,7 @@
     </div>
 
     <script>
-        // Password Check
-        function checkPassword() {
-            const input = document.getElementById('password-input').value;
-            const errorMsg = document.getElementById('error-msg');
-            const inputEl = document.getElementById('password-input');
-
-            if (input === 'jamila_27') {
-                document.getElementById('password-overlay').style.display = 'none';
-                loadRecapTable();
-                errorMsg.textContent = '';
-            } else {
-                errorMsg.textContent = '❌ Password salah! Silakan coba lagi.';
-                inputEl.value = '';
-                inputEl.classList.remove('shake');
-                void inputEl.offsetWidth;
-                inputEl.classList.add('shake');
-                inputEl.focus();
-                setTimeout(() => inputEl.classList.remove('shake'), 400);
-            }
-        }
-
-        // Notification
+        // ─── Notification ────────────────────────────────────────────────────────────
         function showNotification(msg, type) {
             const notif = document.createElement('div');
             notif.className = `notification ${type}`;
@@ -529,236 +484,364 @@
             setTimeout(() => notif.remove(), 3000);
         }
 
-        // Load Recap Table
-        function loadRecapTable() {
-            const tbody = document.getElementById('recap-table-body');
-            tbody.innerHTML = '';
-            
-            const allScores = {};
-            const allDetails = {};
-            
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key.startsWith('dataScore_') || key.startsWith('quizScore_')) {
-                    const data = JSON.parse(localStorage.getItem(key));
-                    const userKey = `${data.nama}_${data.kelas}_${data.absen}`;
-                    
-                    if (!allScores[userKey]) {
-                        allScores[userKey] = { ...data, nilaiPraktikum: 0, nilaiQuiz: 0 };
-                        allDetails[userKey] = { praktikum: null, quiz: null };
-                    }
-                    
-                    if (key.startsWith('dataScore_')) {
-                        if (!allScores[userKey].nilaiPraktikum || data.nilaiPraktikum > allScores[userKey].nilaiPraktikum) {
-                            allScores[userKey].nilaiPraktikum = data.nilaiPraktikum || 0;
-                            allDetails[userKey].praktikum = data;
-                        }
-                    } else {
-                        if (!allScores[userKey].nilaiQuiz || data.nilaiQuiz > allScores[userKey].nilaiQuiz) {
-                            allScores[userKey].nilaiQuiz = data.nilaiQuiz || 0;
-                            allDetails[userKey].quiz = data;
-                        }
-                    }
-                }
-            }
-            
-            Object.keys(allScores).forEach((userKey) => {
-                const s = allScores[userKey];
-                const details = allDetails[userKey];
-                const final = (s.nilaiPraktikum + s.nilaiQuiz) / 2;
-                const cls = final >= 80 ? 'nilai-tinggi' : final >= 60 ? 'nilai-sedang' : 'nilai-rendah';
-                
-                const row = tbody.insertRow();
-                row.className = cls;
-                row.innerHTML = 
-                    '<td>' + s.nama + '</td>' +
-                    '<td>' + s.kelas + '</td>' +
-                    '<td>' + s.absen + '</td>' +
-                    '<td>' + s.nilaiPraktikum + '</td>' +
-                    '<td>' + s.nilaiQuiz + '</td>' +
-                    '<td><strong>' + final.toFixed(1) + '</strong></td>' +
-                    '<td>' + new Date(s.tanggal).toLocaleDateString('id-ID') + '</td>' +
-                    '<td><button class="action-btn" onclick=\'viewDetails(' + JSON.stringify(details).replace(/'/g, "&apos;") + ')\'>📋 Detail</button></td>';
-            });
-            
-            if (Object.keys(allScores).length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:#999;font-style:italic;">Belum ada data. Silakan lakukan praktikum dan quiz terlebih dahulu.</td></tr>';
-            }
+        // ─── Tab Switch ───────────────────────────────────────────────────────────────
+        function switchTab(panelId, btn) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(panelId).classList.add('active');
+            btn.classList.add('active');
         }
 
-        // View Details
-        function viewDetails(details) {
-            let html = '<div style="max-width: 900px; margin: 0 auto;">';
-            html += '<h2 style="color: #1e88e5; margin-bottom: 20px; text-align: center;">📊 Detail Jawaban Siswa</h2>';
-            
-            if (details.praktikum) {
-                const p = details.praktikum;
-                html += '<h3 style="color: #1e88e5; margin-top: 20px; border-bottom: 2px solid #1e88e5; padding-bottom: 10px;">📊 Detail Hasil Praktikum</h3>';
-                html += `<p><strong>Nama:</strong> ${p.nama}</p>`;
-                html += `<p><strong>Kelas:</strong> ${p.kelas}</p>`;
-                html += `<p><strong>Absen:</strong> ${p.absen}</p>`;
-                html += `<p><strong>Nilai:</strong> <span style="font-size: 1.5em; color: #1e88e5; font-weight: bold;">${p.nilaiPraktikum}/100</span></p>`;
-                html += `<p><strong>Tanggal:</strong> ${new Date(p.tanggal).toLocaleString('id-ID')}</p>`;
-                
-                if (p.kesimpulan) {
-                    html += '<h4 style="color: #e91e63; margin-top: 15px;">📝 Kesimpulan:</h4>';
-                    html += `<p style="background: #f5f5f5; padding: 15px; border-radius: 8px; line-height: 1.8; border-left: 4px solid #e91e63;">${p.kesimpulan}</p>`;
-                }
-                
-                if (p.detailJawaban && p.detailJawaban.length > 0) {
-                    html += '<h4 style="color: #e91e63; margin-top: 20px;">📋 Tabel Pengamatan:</h4>';
-                    html += '<table class="data-table"><thead><tr><th>Larutan</th><th>Lakmus Merah</th><th>Lakmus Biru</th><th>pH</th><th>Sifat</th><th>Hidrolisis</th><th>Status</th></tr></thead><tbody>';
-                    
-                    p.detailJawaban.forEach(item => {
-                        const statusIcon = item.benar ? '✓' : '✗';
-                        const statusColor = item.benar ? '#4caf50' : '#f44336';
-                        html += `<tr>
-                            <td>${item.larutan}</td>
-                            <td>${item.lakmusMerah || '-'}</td>
-                            <td>${item.lakmusBiru || '-'}</td>
-                            <td>${item.pH || '-'}</td>
-                            <td>${item.sifat || '-'}</td>
-                            <td>${item.hidrolisis || '-'}</td>
-                            <td style="color: ${statusColor}; font-weight: bold; font-size: 1.2em;">${statusIcon}</td>
-                        </tr>`;
-                        
-                        if (!item.benar) {
-                            html += `<tr style="background: #fff3e0;"><td colspan="7"><small><strong>Jawaban yang benar:</strong> 
-                                Lakmus Merah: ${item.jawabanYangBenar.lakmusMerah}, 
-                                Lakmus Biru: ${item.jawabanYangBenar.lakmusBiru}, 
-                                pH: ${item.jawabanYangBenar.pH}, 
-                                Sifat: ${item.jawabanYangBenar.sifat}, 
-                                Hidrolisis: ${item.jawabanYangBenar.hidrolisis}
-                            </small></td></tr>`;
-                        }
-                    });
-                    html += '</tbody></table>';
+        // ─── Load Data dari localStorage ─────────────────────────────────────────────
+        function getAllData() {
+            const praktikumMap = {};
+            const quizMap     = {};
+
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (!key) continue;
+
+                if (key.startsWith('dataScore_')) {
+                    const data = JSON.parse(localStorage.getItem(key));
+                    const uk   = `${data.nama}__${data.kelas}__${data.absen}`;
+                    // Simpan nilai tertinggi per user
+                    if (!praktikumMap[uk] || (data.nilaiPraktikum || 0) > praktikumMap[uk].nilaiPraktikum) {
+                        praktikumMap[uk] = data;
+                    }
+                } else if (key.startsWith('quizScore_')) {
+                    const data = JSON.parse(localStorage.getItem(key));
+                    const uk   = `${data.nama}__${data.kelas}__${data.absen}`;
+                    if (!quizMap[uk] || (data.nilaiQuiz || 0) > quizMap[uk].nilaiQuiz) {
+                        quizMap[uk] = data;
+                    }
                 }
             }
-            
-            if (details.quiz) {
-                const q = details.quiz;
-                html += '<h3 style="color: #1e88e5; margin-top: 30px; border-bottom: 2px solid #1e88e5; padding-bottom: 10px;">✏️ Detail Jawaban Quiz</h3>';
-                html += `<p><strong>Nilai:</strong> <span style="font-size: 1.5em; color: #1e88e5; font-weight: bold;">${q.nilaiQuiz}/100</span></p>`;
-                html += `<p><strong>Tanggal:</strong> ${new Date(q.tanggal).toLocaleString('id-ID')}</p>`;
-                
-                if (q.detailJawabanQuiz && q.detailJawabanQuiz.length > 0) {
-                    html += '<div style="margin-top: 15px;">';
-                    q.detailJawabanQuiz.forEach((item, index) => {
-                        const bgColor = item.benar ? '#e8f5e9' : '#ffebee';
-                        const icon = item.benar ? '✓' : '✗';
-                        const color = item.benar ? '#4caf50' : '#f44336';
-                        
-                        html += `<div style="background: ${bgColor}; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid ${color};">
-                            <p style="margin: 0; color: #333;"><strong>Soal ${index + 1}:</strong> ${item.pertanyaan}</p>
-                            <p style="margin: 5px 0; color: #666;"><strong>Jawaban Anda:</strong> ${item.jawaban}</p>
-                            ${!item.benar ? `<p style="margin: 5px 0; color: ${color};"><strong>Jawaban Benar:</strong> ${item.jawabanBenar}</p>` : ''}
-                            <p style="margin: 5px 0; font-weight: bold; color: ${color};">${icon} ${item.benar ? 'Benar' : 'Salah'}</p>
-                        </div>`;
-                    });
-                    html += '</div>';
-                }
+            return { praktikumMap, quizMap };
+        }
+
+        // ─── Render Tables ─────────────────────────────────────────────────────────
+        let _praktikumData = [];
+        let _quizData      = [];
+
+        function loadAllTables() {
+            const { praktikumMap, quizMap } = getAllData();
+
+            _praktikumData = Object.values(praktikumMap);
+            _quizData      = Object.values(quizMap);
+
+            renderPraktikumTable(_praktikumData);
+            renderQuizTable(_quizData);
+
+            document.getElementById('badge-praktikum').textContent = _praktikumData.length;
+            document.getElementById('badge-quiz').textContent      = _quizData.length;
+        }
+
+        function renderPraktikumTable(rows) {
+            const tbody = document.getElementById('tbody-praktikum');
+            tbody.innerHTML = '';
+            if (rows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;font-style:italic;">Belum ada data praktikum.</td></tr>';
+                return;
             }
-            
+            rows.forEach((d, idx) => {
+                const n   = d.nilaiPraktikum || 0;
+                const cls = n >= 80 ? 'nilai-tinggi' : n >= 60 ? 'nilai-sedang' : 'nilai-rendah';
+                const row = tbody.insertRow();
+                row.className = cls;
+                row.innerHTML =
+                    `<td>${idx + 1}</td>` +
+                    `<td>${d.nama}</td>` +
+                    `<td>${d.kelas}</td>` +
+                    `<td>${d.absen}</td>` +
+                    `<td><strong>${n}</strong></td>` +
+                    `<td>${new Date(d.tanggal).toLocaleDateString('id-ID')}</td>` +
+                    `<td><button class="action-btn" onclick='viewDetailPraktikum(${JSON.stringify(d).replace(/'/g,"&apos;")})'>📋 Detail</button></td>`;
+            });
+        }
+
+        function renderQuizTable(rows) {
+            const tbody = document.getElementById('tbody-quiz');
+            tbody.innerHTML = '';
+            if (rows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;font-style:italic;">Belum ada data quiz.</td></tr>';
+                return;
+            }
+            rows.forEach((d, idx) => {
+                const n   = d.nilaiQuiz || 0;
+                const cls = n >= 80 ? 'quiz-tinggi' : n >= 60 ? 'quiz-sedang' : 'quiz-rendah';
+                const row = tbody.insertRow();
+                row.className = cls;
+                row.innerHTML =
+                    `<td>${idx + 1}</td>` +
+                    `<td>${d.nama}</td>` +
+                    `<td>${d.kelas}</td>` +
+                    `<td>${d.absen}</td>` +
+                    `<td><strong>${n}</strong></td>` +
+                    `<td>${new Date(d.tanggal).toLocaleDateString('id-ID')}</td>` +
+                    `<td><button class="action-btn" onclick='viewDetailQuiz(${JSON.stringify(d).replace(/'/g,"&apos;")})'>📋 Detail</button></td>`;
+            });
+        }
+
+        // ─── Filter ─────────────────────────────────────────────────────────────────
+        function applyFilters() {
+            const nama  = document.getElementById('filter-nama').value.toLowerCase();
+            const kelas = document.getElementById('filter-kelas').value.toLowerCase();
+
+            const fp = _praktikumData.filter(d =>
+                d.nama.toLowerCase().includes(nama) && d.kelas.toLowerCase().includes(kelas)
+            );
+            const fq = _quizData.filter(d =>
+                d.nama.toLowerCase().includes(nama) && d.kelas.toLowerCase().includes(kelas)
+            );
+
+            renderPraktikumTable(fp);
+            renderQuizTable(fq);
+        }
+
+        // ─── View Detail Praktikum ────────────────────────────────────────────────────
+        function viewDetailPraktikum(p) {
+            let html = '<div style="max-width:900px;margin:0 auto;">';
+            html += '<h2 style="color:#1e88e5;margin-bottom:20px;text-align:center;">📊 Detail Hasil Praktikum</h2>';
+            html += `<p><strong>Nama:</strong> ${p.nama}</p>`;
+            html += `<p><strong>Kelas:</strong> ${p.kelas}</p>`;
+            html += `<p><strong>Absen:</strong> ${p.absen}</p>`;
+            html += `<p><strong>Nilai:</strong> <span style="font-size:1.5em;color:#1e88e5;font-weight:bold;">${p.nilaiPraktikum}/100</span></p>`;
+            html += `<p><strong>Tanggal:</strong> ${new Date(p.tanggal).toLocaleString('id-ID')}</p>`;
+
+            if (p.kesimpulan) {
+                html += '<h4 style="color:#e91e63;margin-top:15px;">📝 Kesimpulan:</h4>';
+                html += `<p style="background:#f5f5f5;padding:15px;border-radius:8px;line-height:1.8;border-left:4px solid #e91e63;">${p.kesimpulan}</p>`;
+            }
+
+            if (p.detailJawaban && p.detailJawaban.length > 0) {
+                html += '<h4 style="color:#e91e63;margin-top:20px;">📋 Tabel Pengamatan:</h4>';
+                html += '<table class="data-table"><thead><tr><th>Larutan</th><th>Lakmus Merah</th><th>Lakmus Biru</th><th>pH</th><th>Sifat</th><th>Hidrolisis</th><th>Status</th></tr></thead><tbody>';
+                p.detailJawaban.forEach(item => {
+                    const ic = item.benar ? '✓' : '✗';
+                    const sc = item.benar ? '#4caf50' : '#f44336';
+                    html += `<tr>
+                        <td>${item.larutan}</td>
+                        <td>${item.lakmusMerah||'-'}</td>
+                        <td>${item.lakmusBiru||'-'}</td>
+                        <td>${item.pH||'-'}</td>
+                        <td>${item.sifat||'-'}</td>
+                        <td>${item.hidrolisis||'-'}</td>
+                        <td style="color:${sc};font-weight:bold;font-size:1.2em;">${ic}</td>
+                    </tr>`;
+                    if (!item.benar) {
+                        html += `<tr style="background:#fff3e0;"><td colspan="7"><small><strong>Jawaban yang benar:</strong>
+                            Lakmus Merah: ${item.jawabanYangBenar.lakmusMerah},
+                            Lakmus Biru: ${item.jawabanYangBenar.lakmusBiru},
+                            pH: ${item.jawabanYangBenar.pH},
+                            Sifat: ${item.jawabanYangBenar.sifat},
+                            Hidrolisis: ${item.jawabanYangBenar.hidrolisis}
+                        </small></td></tr>`;
+                    }
+                });
+                html += '</tbody></table>';
+            }
             html += '</div>';
-            
             document.getElementById('modal-body').innerHTML = html;
             document.getElementById('detail-modal').style.display = 'block';
         }
 
+        // ─── View Detail Quiz ──────────────────────────────────────────────────────
+        function viewDetailQuiz(q) {
+            let html = '<div style="max-width:900px;margin:0 auto;">';
+            html += '<h2 style="color:#e91e63;margin-bottom:20px;text-align:center;">✏️ Detail Jawaban Quiz</h2>';
+            html += `<p><strong>Nama:</strong> ${q.nama}</p>`;
+            html += `<p><strong>Kelas:</strong> ${q.kelas}</p>`;
+            html += `<p><strong>Absen:</strong> ${q.absen}</p>`;
+            html += `<p><strong>Nilai:</strong> <span style="font-size:1.5em;color:#e91e63;font-weight:bold;">${q.nilaiQuiz}/100</span></p>`;
+            html += `<p><strong>Tanggal:</strong> ${new Date(q.tanggal).toLocaleString('id-ID')}</p>`;
+
+            if (q.detailJawabanQuiz && q.detailJawabanQuiz.length > 0) {
+                html += '<div style="margin-top:15px;">';
+                q.detailJawabanQuiz.forEach((item, idx) => {
+                    const bg  = item.benar ? '#e8f5e9' : '#ffebee';
+                    const ic  = item.benar ? '✓' : '✗';
+                    const col = item.benar ? '#4caf50' : '#f44336';
+                    html += `<div style="background:${bg};padding:15px;margin:10px 0;border-radius:8px;border-left:4px solid ${col};">
+                        <p style="margin:0;color:#333;"><strong>Soal ${idx+1}:</strong> ${item.pertanyaan}</p>
+                        <p style="margin:5px 0;color:#666;"><strong>Jawaban Anda:</strong> ${item.jawaban}</p>
+                        ${!item.benar ? `<p style="margin:5px 0;color:${col};"><strong>Jawaban Benar:</strong> ${item.jawabanBenar}</p>` : ''}
+                        <p style="margin:5px 0;font-weight:bold;color:${col};">${ic} ${item.benar?'Benar':'Salah'}</p>
+                    </div>`;
+                });
+                html += '</div>';
+            }
+            html += '</div>';
+            document.getElementById('modal-body').innerHTML = html;
+            document.getElementById('detail-modal').style.display = 'block';
+        }
+
+        // ─── Modal ────────────────────────────────────────────────────────────────
         function closeModal() {
             document.getElementById('detail-modal').style.display = 'none';
         }
+        document.getElementById('detail-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
 
-        // Filter Recap
-        function filterRecap() {
-            const nameFilter = document.getElementById('filter-nama').value.toLowerCase();
-            const classFilter = document.getElementById('filter-kelas').value.toLowerCase();
-            
-            document.querySelectorAll('#recap-table-body tr').forEach(row => {
-                const name = row.cells[0]?.textContent.toLowerCase() || '';
-                const kelas = row.cells[1]?.textContent.toLowerCase() || '';
-                row.style.display = name.includes(nameFilter) && kelas.includes(classFilter) ? '' : 'none';
-            });
+        // ─── Download Excel ────────────────────────────────────────────────────────
+        function downloadExcel(type) {
+            const wb = XLSX.utils.book_new();
+
+            if (type === 'praktikum' || type === 'semua') {
+                // Sheet utama: rekap nilai
+                const pRows = _praktikumData.map((d, i) => ({
+                    'No'              : i + 1,
+                    'Nama'            : d.nama,
+                    'Kelas'           : d.kelas,
+                    'Absen'           : d.absen,
+                    'Nilai Praktikum' : d.nilaiPraktikum || 0,
+                    'Tanggal'         : new Date(d.tanggal).toLocaleString('id-ID')
+                }));
+                const wsP = XLSX.utils.json_to_sheet(pRows);
+                wsP['!cols'] = [
+                    {wch:5},{wch:25},{wch:15},{wch:8},{wch:17},{wch:22}
+                ];
+                XLSX.utils.book_append_sheet(wb, wsP, 'Rekap Praktikum');
+
+                // Sheet detail jawaban praktikum
+                const detailRows = [];
+                _praktikumData.forEach(d => {
+                    if (d.detailJawaban && d.detailJawaban.length > 0) {
+                        d.detailJawaban.forEach(item => {
+                            detailRows.push({
+                                'Nama'            : d.nama,
+                                'Kelas'           : d.kelas,
+                                'Absen'           : d.absen,
+                                'Nilai Praktikum' : d.nilaiPraktikum || 0,
+                                'Larutan'         : item.larutan || '',
+                                'Lakmus Merah'    : item.lakmusMerah || '',
+                                'Lakmus Biru'     : item.lakmusBiru || '',
+                                'pH'              : item.pH || '',
+                                'Sifat'           : item.sifat || '',
+                                'Hidrolisis'      : item.hidrolisis || '',
+                                'Benar/Salah'     : item.benar ? 'Benar' : 'Salah'
+                            });
+                        });
+                    }
+                    if (d.kesimpulan) {
+                        detailRows.push({
+                            'Nama'            : d.nama,
+                            'Kelas'           : d.kelas,
+                            'Absen'           : d.absen,
+                            'Nilai Praktikum' : d.nilaiPraktikum || 0,
+                            'Larutan'         : '--- KESIMPULAN ---',
+                            'Lakmus Merah'    : d.kesimpulan,
+                            'Lakmus Biru'     : '',
+                            'pH'              : '',
+                            'Sifat'           : '',
+                            'Hidrolisis'      : '',
+                            'Benar/Salah'     : ''
+                        });
+                    }
+                });
+                if (detailRows.length > 0) {
+                    const wsDet = XLSX.utils.json_to_sheet(detailRows);
+                    wsDet['!cols'] = [
+                        {wch:25},{wch:12},{wch:8},{wch:16},{wch:20},{wch:15},
+                        {wch:14},{wch:8},{wch:12},{wch:14},{wch:13}
+                    ];
+                    XLSX.utils.book_append_sheet(wb, wsDet, 'Detail Jawaban Praktikum');
+                }
+                XLSX.writeFile(wb, 'Rekap_Nilai_Praktikum.xlsx');
+                showNotification('✅ File Excel Praktikum berhasil diunduh!', 'success');
+            }
+
+            if (type === 'quiz') {
+                // Sheet utama: rekap nilai quiz
+                const qRows = _quizData.map((d, i) => ({
+                    'No'         : i + 1,
+                    'Nama'       : d.nama,
+                    'Kelas'      : d.kelas,
+                    'Absen'      : d.absen,
+                    'Nilai Quiz' : d.nilaiQuiz || 0,
+                    'Tanggal'    : new Date(d.tanggal).toLocaleString('id-ID')
+                }));
+                const wsQ = XLSX.utils.json_to_sheet(qRows);
+                wsQ['!cols'] = [{wch:5},{wch:25},{wch:15},{wch:8},{wch:12},{wch:22}];
+                XLSX.utils.book_append_sheet(wb, wsQ, 'Rekap Quiz');
+
+                // Sheet detail jawaban quiz
+                const quizDetailRows = [];
+                _quizData.forEach(d => {
+                    if (d.detailJawabanQuiz && d.detailJawabanQuiz.length > 0) {
+                        d.detailJawabanQuiz.forEach((item, idx) => {
+                            quizDetailRows.push({
+                                'Nama'           : d.nama,
+                                'Kelas'          : d.kelas,
+                                'Absen'          : d.absen,
+                                'Nilai Quiz'     : d.nilaiQuiz || 0,
+                                'No Soal'        : idx + 1,
+                                'Pertanyaan'     : item.pertanyaan || '',
+                                'Jawaban Siswa'  : item.jawaban || '',
+                                'Jawaban Benar'  : item.jawabanBenar || '',
+                                'Status'         : item.benar ? 'Benar' : 'Salah'
+                            });
+                        });
+                    }
+                });
+                if (quizDetailRows.length > 0) {
+                    const wsQDet = XLSX.utils.json_to_sheet(quizDetailRows);
+                    wsQDet['!cols'] = [
+                        {wch:25},{wch:12},{wch:8},{wch:12},{wch:8},
+                        {wch:50},{wch:30},{wch:30},{wch:10}
+                    ];
+                    XLSX.utils.book_append_sheet(wb, wsQDet, 'Detail Jawaban Quiz');
+                }
+                XLSX.writeFile(wb, 'Rekap_Nilai_Quiz.xlsx');
+                showNotification('✅ File Excel Quiz berhasil diunduh!', 'success');
+            }
         }
 
-        // Reset All Data
+        // ─── Reset All Data ───────────────────────────────────────────────────────
         function resetAllData() {
-            // Konfirmasi pertama
-            if (!confirm('⚠️ PERINGATAN: RESET SEMUA DATA\n\nTindakan ini akan MENGHAPUS PERMANEN:\n✗ Semua data praktikum siswa\n✗ Semua data quiz siswa\n✗ Semua nilai dan jawaban\n\n⚠️ DATA TIDAK DAPAT DIKEMBALIKAN!\n\nApakah Anda yakin ingin melanjutkan?')) {
-                return;
-            }
-            
-            // Konfirmasi kedua dengan input teks
+            if (!confirm('⚠️ PERINGATAN: RESET SEMUA DATA\n\nTindakan ini akan MENGHAPUS PERMANEN:\n✗ Semua data praktikum siswa\n✗ Semua data quiz siswa\n✗ Semua nilai dan jawaban\n\n⚠️ DATA TIDAK DAPAT DIKEMBALIKAN!\n\nApakah Anda yakin ingin melanjutkan?')) return;
+
             const confirmText = prompt('⚠️ KONFIRMASI TERAKHIR\n\nUntuk melanjutkan, ketik kata:\nRESET\n\n(Huruf besar semua, tanpa spasi)');
-            
             if (confirmText !== 'RESET') {
                 alert('❌ Reset dibatalkan.\n\n' + (confirmText ? 'Kata konfirmasi salah.' : 'Tidak ada konfirmasi.'));
                 return;
             }
-            
-            // Proses penghapusan
+
             try {
                 const keysToDelete = [];
-                
-                // Kumpulkan semua keys yang akan dihapus
                 for (let i = 0; i < localStorage.length; i++) {
                     const key = localStorage.key(i);
-                    if (key && (key.startsWith('dataScore_') || key.startsWith('quizScore_'))) {
+                    if (key && (key.startsWith('dataScore_') || key.startsWith('quizScore_')))
                         keysToDelete.push(key);
-                    }
                 }
-                
-                // Cek apakah ada data
                 if (keysToDelete.length === 0) {
-                    alert('ℹ️ TIDAK ADA DATA\n\nTidak ditemukan data yang perlu dihapus.\nDatabase sudah kosong.');
+                    alert('ℹ️ Tidak ditemukan data yang perlu dihapus.');
                     return;
                 }
-                
-                // Hapus semua data
-                let deleted = 0;
-                let failed = 0;
-                
+                let deleted = 0, failed = 0;
                 keysToDelete.forEach(key => {
-                    try {
-                        localStorage.removeItem(key);
-                        deleted++;
-                    } catch (err) {
-                        failed++;
-                    }
+                    try { localStorage.removeItem(key); deleted++; }
+                    catch { failed++; }
                 });
-                
-                // Reload tabel
-                loadRecapTable();
-                
-                // Tampilkan hasil
+                loadAllTables();
                 if (failed === 0) {
-                    alert(`✅ RESET BERHASIL!\n\n📊 Total data terhapus: ${deleted}\n\n✓ Semua data praktikum dihapus\n✓ Semua data quiz dihapus\n✓ Database telah direset`);
+                    alert(`✅ RESET BERHASIL!\n\n📊 Total data terhapus: ${deleted}`);
                     showNotification(`✅ ${deleted} data berhasil dihapus!`, 'success');
                 } else {
-                    alert(`⚠️ RESET SEBAGIAN BERHASIL\n\n✓ Data terhapus: ${deleted}\n✗ Gagal menghapus: ${failed}\n\nSilakan refresh halaman dan coba lagi.`);
-                    showNotification(`⚠️ ${deleted} data terhapus, ${failed} gagal`, 'error');
+                    alert(`⚠️ Terhapus: ${deleted}, Gagal: ${failed}`);
+                    showNotification(`⚠️ ${deleted} terhapus, ${failed} gagal`, 'error');
                 }
-                
             } catch (error) {
-                alert('❌ ERROR!\n\nTerjadi kesalahan saat menghapus data.\n\nError: ' + error.message);
+                alert('❌ ERROR: ' + error.message);
                 showNotification('❌ Gagal mereset data!', 'error');
             }
         }
 
-        // Event Listeners
+        // ─── Init ─────────────────────────────────────────────────────────────────
         document.getElementById('btn-reset-data').addEventListener('click', resetAllData);
 
-        // Close modal when clicking outside
-        document.getElementById('detail-modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
-
-        // Init
         window.addEventListener('load', () => {
-            document.getElementById('password-input').focus();
+            loadAllTables();
         });
     </script>
 </body>
