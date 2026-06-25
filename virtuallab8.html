@@ -551,7 +551,6 @@ localStorage.setItem('dataScore_' + nama + '_' + kelas + '_' + absen, JSON.strin
 
 fetch(SCRIPT_URL, {
     method: "POST",
-    mode: "no-cors",
     headers: {
         "Content-Type": "application/json"
     },
@@ -559,14 +558,21 @@ fetch(SCRIPT_URL, {
         nama: nama,
         kelas: kelas,
         absen: absen,
-        jenis: "Praktikum",
+        tanggal: new Date().toISOString(),
         nilai: score,
-        kesimpulan: conclusion
+        kesimpulan: conclusion,
+        detail: detailJawaban
     })
+})
+.then(response => response.text())
+.then(data => {
+    console.log("Berhasil:", data);
+    showNotification('Data tersubmit & tersimpan! Nilai: ' + score, 'success');
+})
+.catch(error => {
+    console.error("Error:", error);
+    showNotification('Gagal mengirim data ke Spreadsheet!', 'error');
 });
-
-showNotification('Data tersubmit & tersimpan! Nilai: ' + score, 'success');
-        }
 
         // Isi tabel otomatis dari data virtuallab7
         function loadDataFromLab7() {
