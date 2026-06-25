@@ -24,9 +24,10 @@
         .stimulus-box { background: linear-gradient(135deg, #e3f2fd 0%, #fce4ec 100%); border: 2px solid #90caf9; border-left: 6px solid #1e88e5; border-radius: 10px; padding: 18px 20px; margin-bottom: 18px; position: relative; }
         .stimulus-box::before { content: "📌 Stimulus"; display: block; font-weight: 700; color: #1e88e5; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
         .stimulus-box p { color: #333; font-size: 0.97em; line-height: 1.7; margin: 0; }
-        .stimulus-box table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.92em; }
-        .stimulus-box table th { background: #1e88e5; color: white; padding: 8px 12px; text-align: center; font-weight: 600; }
-        .stimulus-box table td { padding: 7px 12px; border: 1px solid #bbdefb; text-align: center; background: white; }
+        .stimulus-box .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 10px; border-radius: 6px; }
+        .stimulus-box table { width: 100%; border-collapse: collapse; font-size: 0.92em; min-width: 320px; }
+        .stimulus-box table th { background: #1e88e5; color: white; padding: 8px 12px; text-align: center; font-weight: 600; white-space: nowrap; }
+        .stimulus-box table td { padding: 7px 12px; border: 1px solid #bbdefb; text-align: center; background: white; white-space: nowrap; }
         .stimulus-box table tr:nth-child(even) td { background: #f5f9ff; }
         .quiz-question { background: white; padding: 25px; border-radius: 10px; margin-bottom: 24px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); border-left: 5px solid #1e88e5; }
         .quiz-question h4 { color: #333; margin-bottom: 18px; font-size: 1.05em; line-height: 1.7; }
@@ -68,8 +69,9 @@
 
             /* Stimulus box */
             .stimulus-box { padding: 12px 14px; font-size: 0.88em; }
-            .stimulus-box table { font-size: 0.8em; }
-            .stimulus-box table th, .stimulus-box table td { padding: 5px 7px; }
+            .stimulus-box .table-wrap { margin-top: 8px; border-radius: 4px; }
+            .stimulus-box table { font-size: 0.78em; }
+            .stimulus-box table th, .stimulus-box table td { padding: 5px 8px; }
 
             /* Soal */
             .quiz-question { padding: 14px; margin-bottom: 16px; border-radius: 8px; }
@@ -289,7 +291,7 @@
             quizQuestions.forEach((q, i) => {
                 const div = document.createElement('div');
                 div.className = 'quiz-question';
-                let stimulusHTML = `<div class="stimulus-box"><p>${q.stimulus}</p></div>`;
+                let stimulusHTML = `<div class="stimulus-box"><p>${q.stimulus.replace(/<table/g, '<div class="table-wrap"><table').replace(/<\/table>/g, '</table></div>')}</p></div>`;
                 let imageHTML = '';
                 if (q.image) {
                     imageHTML = `<div class="image-box"><img src="${q.image}" alt="Gambar Soal ${i+1}" onerror="this.parentElement.style.display='none'"><p>Gambar: ${q.image}</p></div>`;
