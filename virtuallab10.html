@@ -281,58 +281,62 @@
             online ? bar.classList.remove('offline') : bar.classList.add('offline');
         }
 
+        // ── Proses rows dari sheet ────────────────────────────────────────────
+        function prosesRows(rows, tipe) {
+            const map = {};
+            if (!Array.isArray(rows) || rows.length === 0) return map;
+            // Deteksi header: skip baris pertama jika berisi teks
+            let startIdx = 0;
+            if (Array.isArray(rows[0]) && typeof rows[0][1] === 'string' &&
+                rows[0][1].toLowerCase() === 'nama') startIdx = 1;
+
+            for (let i = startIdx; i < rows.length; i++) {
+                const row = rows[i];
+                if (!Array.isArray(row)) continue;
+                const nama    = String(row[1] || '').trim();
+                const kelas   = String(row[2] || '').trim();
+                const absen   = String(row[3] || '').trim();
+                const nilai   = parseFloat(row[4]) || 0;
+                const tanggal = String(row[5] || '').trim();
+                const detail  = row[6] || '';
+                if (!nama) continue;
+                const uk = nama + '__' + kelas + '__' + absen;
+                if (tipe === 'praktikum') {
+                    if (!map[uk] || nilai > (map[uk].nilaiPraktikum || 0))
+                        map[uk] = { nama, kelas, absen, nilaiPraktikum: nilai, tanggal, detailJawaban: safeParseJSON(detail) };
+                } else {
+                    if (!map[uk] || nilai > (map[uk].nilaiQuiz || 0))
+                        map[uk] = { nama, kelas, absen, nilaiQuiz: nilai, tanggal, detailJawabanQuiz: safeParseJSON(detail) };
+                }
+            }
+            return map;
+        }
+
         // ── Load dari Google Sheets (2 sheet terpisah) ───────────────────────
         function loadFromSheets() {
             showLoading('Mengambil data dari Google Sheets...');
             setRealtimeBar(false, 'Menghubungkan ke Google Sheets...');
 
-            // Ambil praktikum dan quiz secara paralel dari sheet berbeda
-            const fetchPraktikum = fetch(APPS_SCRIPT_URL + '?tipe=praktikum').then(r => r.json());
-            const fetchQuiz      = fetch(APPS_SCRIPT_URL + '?tipe=quiz').then(r => r.json());
+            const fetchPraktikum = fetch(APPS_SCRIPT_URL + '?tipe=praktikum').then(r => r.json()).catch(() => []);
+            const fetchQuiz      = fetch(APPS_SCRIPT_URL + '?tipe=quiz').then(r => r.json()).catch(() => []);
 
             Promise.all([fetchPraktikum, fetchQuiz])
-                .then(([rowsPraktikum, rowsQuiz]) => {
+                .then(function(results) {
+                    var rowsPraktikum = results[0];
+                    var rowsQuiz      = results[1];
                     hideLoading();
 
-                    // Proses sheet Nilai Praktikum
-                    const praktikumMap = {};
-                    rowsPraktikum.forEach((row, idx) => {
-                        if (idx === 0) return; // skip header
-                        const [tipe, nama, kelas, absen, nilai, tanggal, detail] = row;
-                        if (!nama) return;
-                        const uk = `${nama}__${kelas}__${absen}`;
-                        const nilaiNum = parseFloat(nilai) || 0;
-                        if (!praktikumMap[uk] || nilaiNum > (praktikumMap[uk].nilaiPraktikum||0)) {
-                            praktikumMap[uk] = { nama, kelas, absen, nilaiPraktikum: nilaiNum, tanggal,
-                                detailJawaban: safeParseJSON(detail) };
-                        }
-                    });
-
-                    // Proses sheet Nilai Quiz
-                    const quizMap = {};
-                    rowsQuiz.forEach((row, idx) => {
-                        if (idx === 0) return; // skip header
-                        const [tipe, nama, kelas, absen, nilai, tanggal, detail] = row;
-                        if (!nama) return;
-                        const uk = `${nama}__${kelas}__${absen}`;
-                        const nilaiNum = parseFloat(nilai) || 0;
-                        if (!quizMap[uk] || nilaiNum > (quizMap[uk].nilaiQuiz||0)) {
-                            quizMap[uk] = { nama, kelas, absen, nilaiQuiz: nilaiNum, tanggal,
-                                detailJawabanQuiz: safeParseJSON(detail) };
-                        }
-                    });
-
-                    _praktikumData = Object.values(praktikumMap);
-                    _quizData      = Object.values(quizMap);
+                    _praktikumData = Object.values(prosesRows(rowsPraktikum, 'praktikum'));
+                    _quizData      = Object.values(prosesRows(rowsQuiz, 'quiz'));
 
                     renderPraktikumTable(_praktikumData);
                     renderQuizTable(_quizData);
                     document.getElementById('badge-praktikum').textContent = _praktikumData.length;
                     document.getElementById('badge-quiz').textContent      = _quizData.length;
-                    setRealtimeBar(true, `✅ Data berhasil dimuat — ${_praktikumData.length} praktikum, ${_quizData.length} quiz`);
+                    setRealtimeBar(true, '✅ Data berhasil dimuat — ' + _praktikumData.length + ' praktikum, ' + _quizData.length + ' quiz');
                     showNotification('Data berhasil dimuat dari Google Sheets!', 'success');
                 })
-                .catch(err => {
+                .catch(function(err) {
                     hideLoading();
                     setRealtimeBar(false, '❌ Gagal terhubung — coba klik Refresh Data');
                     showNotification('Gagal memuat data. Cek koneksi internet.', 'error');
@@ -341,7 +345,13 @@
         }
 
         function safeParseJSON(str) {
-            try { return JSON.parse(str); } catch(e) { return []; }
+            if (!str || str === '' || str === 'null') return [];
+            try {
+                let parsed = JSON.parse(str);
+                // Kalau masih string (double-encoded), parse lagi
+                if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch(e) { return []; }
         }
 
         // ── Render Tables ─────────────────────────────────────────────────────
@@ -361,7 +371,13 @@
                     `<td>${i+1}</td><td>${d.nama}</td><td>${d.kelas}</td><td>${d.absen}</td>` +
                     `<td><strong>${n}</strong></td>` +
                     `<td>${d.tanggal ? new Date(d.tanggal).toLocaleDateString('id-ID') : '-'}</td>` +
-                    `<td><button class="action-btn" onclick='viewDetailPraktikum(${JSON.stringify(d).replace(/'/g,"&apos;")})'>📋 Detail</button></td>`;
+                    `<td><button class="action-btn" data-type="praktikum" data-idx="${i}">📋 Detail</button></td>`;
+            });
+            // Pasang event listener tombol detail
+            tbody.querySelectorAll('button[data-type="praktikum"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    viewDetailPraktikum(_praktikumData[parseInt(this.getAttribute('data-idx'))]);
+                });
             });
         }
 
@@ -381,7 +397,13 @@
                     `<td>${i+1}</td><td>${d.nama}</td><td>${d.kelas}</td><td>${d.absen}</td>` +
                     `<td><strong>${n}</strong></td>` +
                     `<td>${d.tanggal ? new Date(d.tanggal).toLocaleDateString('id-ID') : '-'}</td>` +
-                    `<td><button class="action-btn" onclick='viewDetailQuiz(${JSON.stringify(d).replace(/'/g,"&apos;")})'>📋 Detail</button></td>`;
+                    `<td><button class="action-btn" data-type="quiz" data-idx="${i}">📋 Detail</button></td>`;
+            });
+            // Pasang event listener tombol detail
+            tbody.querySelectorAll('button[data-type="quiz"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    viewDetailQuiz(_quizData[parseInt(this.getAttribute('data-idx'))]);
+                });
             });
         }
 
@@ -389,8 +411,35 @@
         function applyFilters() {
             const nama  = document.getElementById('filter-nama').value.toLowerCase();
             const kelas = document.getElementById('filter-kelas').value.toLowerCase();
-            renderPraktikumTable(_praktikumData.filter(d => d.nama.toLowerCase().includes(nama) && d.kelas.toLowerCase().includes(kelas)));
-            renderQuizTable(_quizData.filter(d => d.nama.toLowerCase().includes(nama) && d.kelas.toLowerCase().includes(kelas)));
+            const fp = _praktikumData.filter(d => d.nama.toLowerCase().includes(nama) && d.kelas.toLowerCase().includes(kelas));
+            const fq = _quizData.filter(d => d.nama.toLowerCase().includes(nama) && d.kelas.toLowerCase().includes(kelas));
+
+            // Render dengan data terfilter — gunakan index dari array filter
+            const tbodyP = document.getElementById('tbody-praktikum');
+            tbodyP.innerHTML = '';
+            if (!fp.length) { tbodyP.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;font-style:italic;">Tidak ada data.</td></tr>'; }
+            else fp.forEach((d, i) => {
+                const n = d.nilaiPraktikum||0; const cls = n>=80?'nilai-tinggi':n>=60?'nilai-sedang':'nilai-rendah';
+                const row = tbodyP.insertRow(); row.className = cls;
+                const realIdx = _praktikumData.indexOf(d);
+                row.innerHTML = `<td>${i+1}</td><td>${d.nama}</td><td>${d.kelas}</td><td>${d.absen}</td><td><strong>${n}</strong></td><td>${d.tanggal?new Date(d.tanggal).toLocaleDateString('id-ID'):'-'}</td><td><button class="action-btn" data-type="praktikum" data-idx="${realIdx}">📋 Detail</button></td>`;
+            });
+            tbodyP.querySelectorAll('button[data-type="praktikum"]').forEach(btn => {
+                btn.addEventListener('click', function() { viewDetailPraktikum(_praktikumData[parseInt(this.getAttribute('data-idx'))]); });
+            });
+
+            const tbodyQ = document.getElementById('tbody-quiz');
+            tbodyQ.innerHTML = '';
+            if (!fq.length) { tbodyQ.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;font-style:italic;">Tidak ada data.</td></tr>'; }
+            else fq.forEach((d, i) => {
+                const n = d.nilaiQuiz||0; const cls = n>=80?'quiz-tinggi':n>=60?'quiz-sedang':'quiz-rendah';
+                const row = tbodyQ.insertRow(); row.className = cls;
+                const realIdx = _quizData.indexOf(d);
+                row.innerHTML = `<td>${i+1}</td><td>${d.nama}</td><td>${d.kelas}</td><td>${d.absen}</td><td><strong>${n}</strong></td><td>${d.tanggal?new Date(d.tanggal).toLocaleDateString('id-ID'):'-'}</td><td><button class="action-btn" data-type="quiz" data-idx="${realIdx}">📋 Detail</button></td>`;
+            });
+            tbodyQ.querySelectorAll('button[data-type="quiz"]').forEach(btn => {
+                btn.addEventListener('click', function() { viewDetailQuiz(_quizData[parseInt(this.getAttribute('data-idx'))]); });
+            });
         }
 
         // ── Detail Modal ──────────────────────────────────────────────────────
