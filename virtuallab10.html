@@ -16,31 +16,70 @@
         .header-text p { font-size:1.1em; opacity:.95; padding-left:35px; }
         .content-box { padding:40px; }
         h2 { color:#1e88e5; margin-bottom:30px; text-align:center; font-size:2em; }
+
+        /* Loading */
+        #loading-overlay { display:none; position:fixed; inset:0; background:rgba(255,255,255,.85); z-index:9000; align-items:center; justify-content:center; flex-direction:column; gap:16px; }
+        #loading-overlay.show { display:flex; }
+        .spinner { width:50px; height:50px; border:5px solid #e0e0e0; border-top-color:#1e88e5; border-radius:50%; animation:spin .8s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        #loading-text { color:#1e88e5; font-size:1.1em; font-weight:600; }
+
+        /* Realtime bar */
         .realtime-bar { display:flex; align-items:center; gap:10px; background:#e8f5e9; border:1px solid #a5d6a7; border-radius:10px; padding:10px 18px; margin-bottom:20px; font-size:.92em; color:#2e7d32; font-weight:600; }
         .realtime-dot { width:10px; height:10px; background:#4caf50; border-radius:50%; animation:pulse 1.5s infinite; }
-        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.3)} }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(1.3);} }
         .realtime-bar.offline { background:#ffebee; border-color:#ef9a9a; color:#c62828; }
         .realtime-bar.offline .realtime-dot { background:#f44336; animation:none; }
+
+        /* Password Gate */
+        #password-gate { position:fixed; inset:0; background:linear-gradient(135deg,#1e88e5 0%,#e91e63 100%); z-index:99999; display:flex; align-items:center; justify-content:center; padding:20px; }
+        .gate-card { background:white; border-radius:24px; padding:50px 45px 45px; width:100%; max-width:420px; box-shadow:0 20px 60px rgba(0,0,0,.35); text-align:center; animation:gateIn .4s ease; }
+        @keyframes gateIn { from{opacity:0;transform:translateY(30px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);} }
+        .gate-icon { font-size:3.5em; margin-bottom:10px; }
+        .gate-card h2 { color:#1e88e5; font-size:1.5em; margin-bottom:6px; }
+        .gate-card p { color:#888; font-size:.95em; margin-bottom:28px; }
+        .gate-input-wrap { position:relative; margin-bottom:18px; }
+        .gate-input-wrap input { width:100%; padding:14px 48px 14px 18px; border:2px solid #e0e0e0; border-radius:10px; font-size:1.05em; outline:none; transition:border-color .3s; letter-spacing:2px; }
+        .gate-input-wrap input:focus { border-color:#1e88e5; }
+        .gate-input-wrap input.shake { border-color:#f44336; animation:shake .4s ease; }
+        @keyframes shake { 0%,100%{transform:translateX(0);}20%{transform:translateX(-8px);}40%{transform:translateX(8px);}60%{transform:translateX(-5px);}80%{transform:translateX(5px);} }
+        .toggle-pw { position:absolute; right:14px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.2em; color:#aaa; }
+        .toggle-pw:hover { color:#1e88e5; }
+        .gate-error { color:#f44336; font-size:.88em; margin-bottom:14px; min-height:20px; font-weight:600; }
+        .gate-btn { width:100%; padding:14px; background:linear-gradient(135deg,#1e88e5,#e91e63); color:white; border:none; border-radius:10px; font-size:1.05em; font-weight:700; cursor:pointer; transition:all .2s; }
+        .gate-btn:hover { opacity:.9; transform:translateY(-2px); }
+        .gate-footer { margin-top:22px; font-size:.8em; color:#ccc; }
+
+        /* Tabs */
         .tab-nav { display:flex; gap:10px; margin-bottom:30px; border-bottom:3px solid #e0e0e0; }
         .tab-btn { padding:12px 28px; background:#f5f5f5; color:#666; border:none; border-radius:10px 10px 0 0; cursor:pointer; font-size:1em; font-weight:600; transition:all .3s; position:relative; bottom:-3px; }
         .tab-btn.active { background:linear-gradient(135deg,#1e88e5,#e91e63); color:white; border-bottom:3px solid white; }
         .tab-btn:hover:not(.active) { background:#e3f2fd; color:#1e88e5; }
         .tab-panel { display:none; }
         .tab-panel.active { display:block; }
+
+        /* Controls */
         .recap-controls { display:flex; gap:15px; margin-bottom:20px; flex-wrap:wrap; }
         .recap-controls input { flex:1; min-width:180px; padding:12px 15px; border:2px solid #e0e0e0; border-radius:8px; font-size:1em; }
         .recap-controls button { padding:12px 24px; background:#1e88e5; color:white; border:none; border-radius:8px; cursor:pointer; font-size:1em; font-weight:600; transition:all .3s; }
         .recap-controls button:hover { background:#1976d2; transform:translateY(-2px); }
         .btn-reset { background:#f44336 !important; }
         .btn-reset:hover { background:#d32f2f !important; }
+        .btn-refresh { background:#43a047 !important; }
+        .btn-refresh:hover { background:#2e7d32 !important; }
+
+        /* Section header */
         .section-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:15px; margin-bottom:20px; }
         .section-header h3 { font-size:1.4em; color:#1e88e5; }
         .btn-download-excel { padding:10px 20px; background:linear-gradient(135deg,#43a047,#1b5e20); color:white; border:none; border-radius:8px; cursor:pointer; font-size:.95em; font-weight:600; transition:all .3s; }
         .btn-download-excel:hover { transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,.25); }
+
+        /* Table */
         .data-table { width:100%; border-collapse:collapse; margin:10px 0 20px; box-shadow:0 3px 10px rgba(0,0,0,.1); border-radius:10px; overflow:hidden; }
         .data-table thead { background:linear-gradient(135deg,#1e88e5,#e91e63); color:white; }
         .data-table th { padding:15px; text-align:left; font-weight:600; font-size:1em; }
         .data-table td { padding:12px 15px; border-bottom:1px solid #e0e0e0; }
+        .data-table tbody tr { transition:all .3s; }
         .data-table tbody tr:hover { background:#f5f5f5; }
         .nilai-tinggi { background:#e8f5e9; } .nilai-sedang { background:#fff9c4; } .nilai-rendah { background:#ffebee; }
         .quiz-tinggi  { background:#e3f2fd; } .quiz-sedang  { background:#fff9c4; } .quiz-rendah  { background:#fce4ec; }
@@ -50,35 +89,27 @@
         .keterangan-box h4 { color:#1e88e5; margin-bottom:15px; }
         .keterangan-box p { margin:8px 0; color:#333; font-size:.95em; }
         .badge { display:inline-block; background:#e91e63; color:white; border-radius:20px; padding:2px 10px; font-size:.85em; margin-left:8px; }
+
+        /* Notification */
         .notification { position:fixed; top:20px; right:20px; padding:18px 28px; background:white; border-radius:10px; box-shadow:0 5px 25px rgba(0,0,0,.3); z-index:10000; max-width:360px; }
-        .notification.success { border-left:5px solid #4caf50; } .notification.error { border-left:5px solid #f44336; } .notification.info { border-left:5px solid #1e88e5; }
+        .notification.success { border-left:5px solid #4caf50; }
+        .notification.error   { border-left:5px solid #f44336; }
+        .notification.info    { border-left:5px solid #1e88e5; }
+
+        /* Modal */
         .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.8); z-index:9999; overflow-y:auto; padding:20px; }
         .modal-content { background:white; max-width:1000px; margin:40px auto; padding:40px; border-radius:20px; box-shadow:0 10px 50px rgba(0,0,0,.5); position:relative; }
         .modal-close { position:absolute; top:15px; right:15px; background:#f44336; color:white; border:none; border-radius:50%; width:35px; height:35px; cursor:pointer; font-size:20px; font-weight:bold; }
-        #password-gate { position:fixed; inset:0; background:linear-gradient(135deg,#1e88e5 0%,#e91e63 100%); z-index:99999; display:flex; align-items:center; justify-content:center; padding:20px; }
-        .gate-card { background:white; border-radius:24px; padding:50px 45px 45px; width:100%; max-width:420px; box-shadow:0 20px 60px rgba(0,0,0,.35); text-align:center; animation:gateIn .4s ease; }
-        @keyframes gateIn { from{opacity:0;transform:translateY(30px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
-        .gate-icon { font-size:3.5em; margin-bottom:10px; }
-        .gate-card h2 { color:#1e88e5; font-size:1.5em; margin-bottom:6px; }
-        .gate-card p  { color:#888; font-size:.95em; margin-bottom:28px; }
-        .gate-input-wrap { position:relative; margin-bottom:18px; }
-        .gate-input-wrap input { width:100%; padding:14px 48px 14px 18px; border:2px solid #e0e0e0; border-radius:10px; font-size:1.05em; outline:none; transition:border-color .3s; letter-spacing:2px; }
-        .gate-input-wrap input:focus { border-color:#1e88e5; }
-        .gate-input-wrap input.shake { border-color:#f44336; animation:shake .4s ease; }
-        @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
-        .toggle-pw { position:absolute; right:14px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.2em; color:#aaa; }
-        .toggle-pw:hover { color:#1e88e5; }
-        .gate-error { color:#f44336; font-size:.88em; margin-bottom:14px; min-height:20px; font-weight:600; }
-        .gate-btn { width:100%; padding:14px; background:linear-gradient(135deg,#1e88e5,#e91e63); color:white; border:none; border-radius:10px; font-size:1.05em; font-weight:700; cursor:pointer; transition:all .2s; }
-        .gate-btn:hover { opacity:.9; transform:translateY(-2px); }
-        .gate-footer { margin-top:22px; font-size:.8em; color:#ccc; }
+        .modal-close:hover { background:#d32f2f; }
+
         footer { background:linear-gradient(135deg,#5b8dd3,#c77ab5); padding:30px 20px; text-align:center; color:white; }
         footer p { margin:5px 0; font-size:1em; line-height:1.6; }
-        @media(max-width:768px){ .content-box{padding:20px} .recap-controls{flex-direction:column} .data-table{font-size:.85em} .data-table th,.data-table td{padding:8px} .section-header{flex-direction:column;align-items:flex-start} }
+        @media (max-width:768px) { .content-box{padding:20px;} .recap-controls{flex-direction:column;} .data-table{font-size:.85em;} .data-table th,.data-table td{padding:8px;} .section-header{flex-direction:column;align-items:flex-start;} }
     </style>
 </head>
 <body>
 
+    <!-- Password Gate -->
     <div id="password-gate">
         <div class="gate-card">
             <div class="gate-icon">🔐</div>
@@ -94,6 +125,12 @@
         </div>
     </div>
 
+    <!-- Loading -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <span id="loading-text">Memuat data...</span>
+    </div>
+
     <div class="container">
         <header>
             <img src="logoum.png" alt="Logo UM" class="header-logo">
@@ -102,22 +139,28 @@
                 <p>Laboratorium Virtual Hidrolisis Garam</p>
             </div>
         </header>
+
         <div class="content-box">
             <h2>Rekapan Nilai Praktikum</h2>
+
             <div class="realtime-bar" id="realtime-bar">
                 <div class="realtime-dot"></div>
-                <span id="realtime-text">Menghubungkan ke server...</span>
+                <span id="realtime-text">Menghubungkan ke Google Sheets...</span>
             </div>
+
             <div class="recap-controls">
                 <input type="text" id="filter-nama"  placeholder="Cari berdasarkan nama..."  oninput="applyFilters()">
                 <input type="text" id="filter-kelas" placeholder="Cari berdasarkan kelas..." oninput="applyFilters()">
                 <button onclick="applyFilters()">🔍 Filter</button>
-                <button class="btn-reset" onclick="resetAllData()">🔄 Reset Semua Data</button>
+                <button class="btn-refresh" onclick="loadFromSheets()">🔄 Refresh Data</button>
+                <button class="btn-reset" id="btn-reset-data">🗑 Reset Semua Data</button>
             </div>
+
             <div class="tab-nav">
                 <button class="tab-btn active" onclick="switchTab('tab-praktikum',this)">📊 Nilai Praktikum <span class="badge" id="badge-praktikum">0</span></button>
                 <button class="tab-btn" onclick="switchTab('tab-quiz',this)">✏️ Nilai Quiz <span class="badge" id="badge-quiz">0</span></button>
             </div>
+
             <div class="tab-panel active" id="tab-praktikum">
                 <div class="section-header">
                     <h3>📊 Tabel Nilai Praktikum</h3>
@@ -134,6 +177,7 @@
                     <p>🔴 Merah: Nilai &lt; 60 (Perlu Perbaikan)</p>
                 </div>
             </div>
+
             <div class="tab-panel" id="tab-quiz">
                 <div class="section-header">
                     <h3>✏️ Tabel Nilai Quiz</h3>
@@ -151,6 +195,7 @@
                 </div>
             </div>
         </div>
+
         <footer>
             <p><strong>Dibuat oleh: Jamila Fitrianingsih</strong></p>
             <p>Universitas Negeri Malang - Pendidikan Kimia</p>
@@ -166,15 +211,15 @@
     </div>
 
     <script>
-        // ═══════════════════════════════════════════════════
-        //  GANTI URL INI DENGAN LINK APPS SCRIPT MILIKMU
-        // ═══════════════════════════════════════════════════
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZrKluR0sVFxw10WPFmlZGVdEf3KvC3h4jmkIHbQHcv2qREeUO5OmJ-rWIrKUfLWmAsw/exec";
-        // ═══════════════════════════════════════════════════
-
+        // ── URL Google Apps Script ──────────────────────────────────────────
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyWYJhRaU2DsXJq4_FH8FSpGI6WEZ3jeEHzIyy5ZL5ZH0lJF5sp-4fk1jO3cZ7QDzkluQ/exec';
         const CORRECT_PASSWORD = 'jamila_27';
         const SESSION_KEY      = 'guru_auth_hidrolisis';
 
+        let _praktikumData = [];
+        let _quizData      = [];
+
+        // ── Password ─────────────────────────────────────────────────────────
         function checkPassword() {
             const input = document.getElementById('pw-input');
             const errEl = document.getElementById('pw-error');
@@ -183,193 +228,247 @@
                 const gate = document.getElementById('password-gate');
                 gate.style.transition = 'opacity .4s ease';
                 gate.style.opacity = '0';
-                setTimeout(() => { gate.remove(); loadAllData(); }, 420);
+                setTimeout(() => { gate.remove(); loadFromSheets(); }, 420);
                 errEl.textContent = '';
             } else {
                 errEl.textContent = '❌ Kata sandi salah. Coba lagi.';
-                input.classList.remove('shake'); void input.offsetWidth; input.classList.add('shake');
-                input.value = ''; input.focus();
+                input.classList.remove('shake');
+                void input.offsetWidth;
+                input.classList.add('shake');
+                input.value = '';
+                input.focus();
                 setTimeout(() => input.classList.remove('shake'), 500);
             }
         }
-        function togglePw() { const inp=document.getElementById('pw-input'); inp.type=inp.type==='password'?'text':'password'; }
-
-        function showNotification(msg, type) {
-            const n = document.createElement('div'); n.className=`notification ${type}`;
-            n.innerHTML=`<strong>${type==='success'?'✓':type==='error'?'✗':'ℹ'}</strong> ${msg}`;
-            document.body.appendChild(n); setTimeout(()=>n.remove(),3500);
+        function togglePw() {
+            const inp = document.getElementById('pw-input');
+            inp.type = inp.type === 'password' ? 'text' : 'password';
         }
+        window.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem(SESSION_KEY) === '1') {
+                const gate = document.getElementById('password-gate');
+                if (gate) gate.remove();
+                loadFromSheets();
+            } else {
+                setTimeout(() => { const inp = document.getElementById('pw-input'); if(inp) inp.focus(); }, 300);
+            }
+        });
+
+        // ── Helpers ───────────────────────────────────────────────────────────
+        function showNotification(msg, type) {
+            const n = document.createElement('div');
+            n.className = `notification ${type}`;
+            n.innerHTML = `<strong>${type==='success'?'✓':type==='error'?'✗':'ℹ'}</strong> ${msg}`;
+            document.body.appendChild(n);
+            setTimeout(() => n.remove(), 3500);
+        }
+        function showLoading(t='Memuat data...') {
+            document.getElementById('loading-text').textContent = t;
+            document.getElementById('loading-overlay').classList.add('show');
+        }
+        function hideLoading() { document.getElementById('loading-overlay').classList.remove('show'); }
         function switchTab(panelId, btn) {
-            document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-            document.getElementById(panelId).classList.add('active'); btn.classList.add('active');
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(panelId).classList.add('active');
+            btn.classList.add('active');
         }
         function closeModal() { document.getElementById('detail-modal').style.display='none'; }
-        document.getElementById('detail-modal').addEventListener('click',function(e){ if(e.target===this)closeModal(); });
+        document.getElementById('detail-modal').addEventListener('click', function(e) { if(e.target===this) closeModal(); });
         function setRealtimeBar(online, text) {
-            const bar=document.getElementById('realtime-bar');
-            document.getElementById('realtime-text').textContent=text;
+            const bar = document.getElementById('realtime-bar');
+            document.getElementById('realtime-text').textContent = text;
             online ? bar.classList.remove('offline') : bar.classList.add('offline');
         }
 
-        let _praktikumData = [];
-        let _quizData      = [];
+        // ── Load dari Google Sheets (2 sheet terpisah) ───────────────────────
+        function loadFromSheets() {
+            showLoading('Mengambil data dari Google Sheets...');
+            setRealtimeBar(false, 'Menghubungkan ke Google Sheets...');
 
-        async function loadAllData() {
-            if (SCRIPT_URL === "GANTI_DENGAN_URL_APPS_SCRIPT") {
-                setRealtimeBar(false, '⚠️ URL Apps Script belum diisi — menampilkan data lokal saja');
-                loadLocalStorage();
+            // Ambil praktikum dan quiz secara paralel dari sheet berbeda
+            const fetchPraktikum = fetch(APPS_SCRIPT_URL + '?tipe=praktikum').then(r => r.json());
+            const fetchQuiz      = fetch(APPS_SCRIPT_URL + '?tipe=quiz').then(r => r.json());
+
+            Promise.all([fetchPraktikum, fetchQuiz])
+                .then(([rowsPraktikum, rowsQuiz]) => {
+                    hideLoading();
+
+                    // Proses sheet Nilai Praktikum
+                    const praktikumMap = {};
+                    rowsPraktikum.forEach((row, idx) => {
+                        if (idx === 0) return; // skip header
+                        const [tipe, nama, kelas, absen, nilai, tanggal, detail] = row;
+                        if (!nama) return;
+                        const uk = `${nama}__${kelas}__${absen}`;
+                        const nilaiNum = parseFloat(nilai) || 0;
+                        if (!praktikumMap[uk] || nilaiNum > (praktikumMap[uk].nilaiPraktikum||0)) {
+                            praktikumMap[uk] = { nama, kelas, absen, nilaiPraktikum: nilaiNum, tanggal,
+                                detailJawaban: safeParseJSON(detail) };
+                        }
+                    });
+
+                    // Proses sheet Nilai Quiz
+                    const quizMap = {};
+                    rowsQuiz.forEach((row, idx) => {
+                        if (idx === 0) return; // skip header
+                        const [tipe, nama, kelas, absen, nilai, tanggal, detail] = row;
+                        if (!nama) return;
+                        const uk = `${nama}__${kelas}__${absen}`;
+                        const nilaiNum = parseFloat(nilai) || 0;
+                        if (!quizMap[uk] || nilaiNum > (quizMap[uk].nilaiQuiz||0)) {
+                            quizMap[uk] = { nama, kelas, absen, nilaiQuiz: nilaiNum, tanggal,
+                                detailJawabanQuiz: safeParseJSON(detail) };
+                        }
+                    });
+
+                    _praktikumData = Object.values(praktikumMap);
+                    _quizData      = Object.values(quizMap);
+
+                    renderPraktikumTable(_praktikumData);
+                    renderQuizTable(_quizData);
+                    document.getElementById('badge-praktikum').textContent = _praktikumData.length;
+                    document.getElementById('badge-quiz').textContent      = _quizData.length;
+                    setRealtimeBar(true, `✅ Data berhasil dimuat — ${_praktikumData.length} praktikum, ${_quizData.length} quiz`);
+                    showNotification('Data berhasil dimuat dari Google Sheets!', 'success');
+                })
+                .catch(err => {
+                    hideLoading();
+                    setRealtimeBar(false, '❌ Gagal terhubung — coba klik Refresh Data');
+                    showNotification('Gagal memuat data. Cek koneksi internet.', 'error');
+                    console.error('[Sheets] Error:', err);
+                });
+        }
+
+        function safeParseJSON(str) {
+            try { return JSON.parse(str); } catch(e) { return []; }
+        }
+
+        // ── Render Tables ─────────────────────────────────────────────────────
+        function renderPraktikumTable(rows) {
+            const tbody = document.getElementById('tbody-praktikum');
+            tbody.innerHTML = '';
+            if (!rows.length) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;font-style:italic;">Belum ada data praktikum.</td></tr>';
                 return;
             }
-            setRealtimeBar(true, '🔄 Memuat data dari server...');
-            try {
-                const [resP, resQ] = await Promise.all([
-                    fetch(SCRIPT_URL + '?type=praktikum'),
-                    fetch(SCRIPT_URL + '?type=quiz')
-                ]);
-                const dataP = await resP.json();
-                const dataQ = await resQ.json();
-
-                _praktikumData = dataP.data || [];
-                _quizData      = dataQ.data || [];
-
-                renderPraktikumTable(_praktikumData);
-                renderQuizTable(_quizData);
-                document.getElementById('badge-praktikum').textContent = _praktikumData.length;
-                document.getElementById('badge-quiz').textContent      = _quizData.length;
-                setRealtimeBar(true, '🟢 Terhubung ke server — ' + _praktikumData.length + ' praktikum, ' + _quizData.length + ' quiz');
-
-                // Auto-refresh setiap 30 detik
-                setTimeout(loadAllData, 30000);
-            } catch(e) {
-                setRealtimeBar(false, '🔴 Gagal ke server — menampilkan data lokal');
-                loadLocalStorage();
-            }
-        }
-
-        function loadLocalStorage() {
-            const rawP={}, rawQ={};
-            for(let i=0;i<localStorage.length;i++){
-                const key=localStorage.key(i); if(!key) continue;
-                if(key.startsWith('dataScore_')){ const d=JSON.parse(localStorage.getItem(key)); const uk=`${d.nama}__${d.kelas}__${d.absen}`; if(!rawP[uk]||(d.nilaiPraktikum||0)>(rawP[uk].nilaiPraktikum||0)) rawP[uk]=d; }
-                else if(key.startsWith('quizScore_')){ const d=JSON.parse(localStorage.getItem(key)); const uk=`${d.nama}__${d.kelas}__${d.absen}`; if(!rawQ[uk]||(d.nilaiQuiz||0)>(rawQ[uk].nilaiQuiz||0)) rawQ[uk]=d; }
-            }
-            _praktikumData=Object.values(rawP); _quizData=Object.values(rawQ);
-            renderPraktikumTable(_praktikumData); renderQuizTable(_quizData);
-            document.getElementById('badge-praktikum').textContent=_praktikumData.length;
-            document.getElementById('badge-quiz').textContent=_quizData.length;
-        }
-
-        function renderPraktikumTable(rows) {
-            const tbody=document.getElementById('tbody-praktikum'); tbody.innerHTML='';
-            if(!rows.length){ tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;font-style:italic;">Belum ada data praktikum.</td></tr>'; return; }
-            rows.forEach((d,i)=>{ const n=d.nilaiPraktikum||0; const cls=n>=80?'nilai-tinggi':n>=60?'nilai-sedang':'nilai-rendah'; const row=tbody.insertRow(); row.className=cls;
-                row.innerHTML=`<td>${i+1}</td><td>${d.nama}</td><td>${d.kelas}</td><td>${d.absen}</td><td><strong>${n}</strong></td><td>${d.tanggal?new Date(d.tanggal).toLocaleDateString('id-ID'):'-'}</td><td><button class="action-btn" onclick='viewDetailPraktikum(${JSON.stringify(d).replace(/'/g,"&apos;")})'>📋 Detail</button></td>`; });
+            rows.forEach((d, i) => {
+                const n   = d.nilaiPraktikum || 0;
+                const cls = n>=80?'nilai-tinggi':n>=60?'nilai-sedang':'nilai-rendah';
+                const row = tbody.insertRow();
+                row.className = cls;
+                row.innerHTML =
+                    `<td>${i+1}</td><td>${d.nama}</td><td>${d.kelas}</td><td>${d.absen}</td>` +
+                    `<td><strong>${n}</strong></td>` +
+                    `<td>${d.tanggal ? new Date(d.tanggal).toLocaleDateString('id-ID') : '-'}</td>` +
+                    `<td><button class="action-btn" onclick='viewDetailPraktikum(${JSON.stringify(d).replace(/'/g,"&apos;")})'>📋 Detail</button></td>`;
+            });
         }
 
         function renderQuizTable(rows) {
-            const tbody=document.getElementById('tbody-quiz'); tbody.innerHTML='';
-            if(!rows.length){ tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;font-style:italic;">Belum ada data quiz.</td></tr>'; return; }
-            rows.forEach((d,i)=>{ const n=d.nilaiQuiz||0; const cls=n>=80?'quiz-tinggi':n>=60?'quiz-sedang':'quiz-rendah'; const row=tbody.insertRow(); row.className=cls;
-                row.innerHTML=`<td>${i+1}</td><td>${d.nama}</td><td>${d.kelas}</td><td>${d.absen}</td><td><strong>${n}</strong></td><td>${d.tanggal?new Date(d.tanggal).toLocaleDateString('id-ID'):'-'}</td><td><button class="action-btn" onclick='viewDetailQuiz(${JSON.stringify(d).replace(/'/g,"&apos;")})'>📋 Detail</button></td>`; });
-        }
-
-        function applyFilters() {
-            const nama=document.getElementById('filter-nama').value.toLowerCase();
-            const kelas=document.getElementById('filter-kelas').value.toLowerCase();
-            renderPraktikumTable(_praktikumData.filter(d=>d.nama.toLowerCase().includes(nama)&&d.kelas.toLowerCase().includes(kelas)));
-            renderQuizTable(_quizData.filter(d=>d.nama.toLowerCase().includes(nama)&&d.kelas.toLowerCase().includes(kelas)));
-        }
-
-        function viewDetailPraktikum(p) {
-            let html='<div style="max-width:900px;margin:0 auto;">';
-            html+=`<h2 style="color:#1e88e5;margin-bottom:20px;text-align:center;">📊 Detail Hasil Praktikum</h2>`;
-            html+=`<p><strong>Nama:</strong> ${p.nama}</p><p><strong>Kelas:</strong> ${p.kelas}</p><p><strong>Absen:</strong> ${p.absen}</p>`;
-            html+=`<p><strong>Nilai:</strong> <span style="font-size:1.5em;color:#1e88e5;font-weight:bold;">${p.nilaiPraktikum||0}/100</span></p>`;
-            html+=`<p><strong>Tanggal:</strong> ${p.tanggal?new Date(p.tanggal).toLocaleString('id-ID'):'-'}</p>`;
-            if(p.kesimpulan) html+=`<h4 style="color:#e91e63;margin-top:15px;">📝 Kesimpulan:</h4><p style="background:#f5f5f5;padding:15px;border-radius:8px;line-height:1.8;border-left:4px solid #e91e63;">${p.kesimpulan}</p>`;
-            const detail = typeof p.detailJawaban==='string' ? JSON.parse(p.detailJawaban||'[]') : (p.detailJawaban||[]);
-            if(detail.length){
-                html+='<h4 style="color:#e91e63;margin-top:20px;">📋 Tabel Pengamatan:</h4>';
-                html+='<table class="data-table"><thead><tr><th>Larutan</th><th>Lakmus Merah</th><th>Lakmus Biru</th><th>pH</th><th>Sifat</th><th>Hidrolisis</th><th>Status</th></tr></thead><tbody>';
-                detail.forEach(item=>{
-                    const ic=item.benar?'✓':'✗'; const sc=item.benar?'#4caf50':'#f44336';
-                    html+=`<tr><td>${item.larutan}</td><td>${item.lakmusMerah||'-'}</td><td>${item.lakmusBiru||'-'}</td><td>${item.pH||'-'}</td><td>${item.sifat||'-'}</td><td>${item.hidrolisis||'-'}</td><td style="color:${sc};font-weight:bold;font-size:1.2em;">${ic}</td></tr>`;
-                    if(!item.benar&&item.jawabanYangBenar) html+=`<tr style="background:#fff3e0;"><td colspan="7"><small><strong>Jawaban benar:</strong> Lakmus Merah:${item.jawabanYangBenar.lakmusMerah}, Lakmus Biru:${item.jawabanYangBenar.lakmusBiru}, pH:${item.jawabanYangBenar.pH}, Sifat:${item.jawabanYangBenar.sifat}, Hidrolisis:${item.jawabanYangBenar.hidrolisis}</small></td></tr>`;
-                });
-                html+='</tbody></table>';
+            const tbody = document.getElementById('tbody-quiz');
+            tbody.innerHTML = '';
+            if (!rows.length) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;font-style:italic;">Belum ada data quiz.</td></tr>';
+                return;
             }
-            html+='</div>';
-            document.getElementById('modal-body').innerHTML=html;
-            document.getElementById('detail-modal').style.display='block';
+            rows.forEach((d, i) => {
+                const n   = d.nilaiQuiz || 0;
+                const cls = n>=80?'quiz-tinggi':n>=60?'quiz-sedang':'quiz-rendah';
+                const row = tbody.insertRow();
+                row.className = cls;
+                row.innerHTML =
+                    `<td>${i+1}</td><td>${d.nama}</td><td>${d.kelas}</td><td>${d.absen}</td>` +
+                    `<td><strong>${n}</strong></td>` +
+                    `<td>${d.tanggal ? new Date(d.tanggal).toLocaleDateString('id-ID') : '-'}</td>` +
+                    `<td><button class="action-btn" onclick='viewDetailQuiz(${JSON.stringify(d).replace(/'/g,"&apos;")})'>📋 Detail</button></td>`;
+            });
+        }
+
+        // ── Filter ────────────────────────────────────────────────────────────
+        function applyFilters() {
+            const nama  = document.getElementById('filter-nama').value.toLowerCase();
+            const kelas = document.getElementById('filter-kelas').value.toLowerCase();
+            renderPraktikumTable(_praktikumData.filter(d => d.nama.toLowerCase().includes(nama) && d.kelas.toLowerCase().includes(kelas)));
+            renderQuizTable(_quizData.filter(d => d.nama.toLowerCase().includes(nama) && d.kelas.toLowerCase().includes(kelas)));
+        }
+
+        // ── Detail Modal ──────────────────────────────────────────────────────
+        function viewDetailPraktikum(p) {
+            let html = '<div style="max-width:900px;margin:0 auto;">';
+            html += '<h2 style="color:#1e88e5;margin-bottom:20px;text-align:center;">📊 Detail Hasil Praktikum</h2>';
+            html += `<p><strong>Nama:</strong> ${p.nama}</p><p><strong>Kelas:</strong> ${p.kelas}</p><p><strong>Absen:</strong> ${p.absen}</p>`;
+            html += `<p><strong>Nilai:</strong> <span style="font-size:1.5em;color:#1e88e5;font-weight:bold;">${p.nilaiPraktikum||0}/100</span></p>`;
+            html += `<p><strong>Tanggal:</strong> ${p.tanggal ? new Date(p.tanggal).toLocaleString('id-ID') : '-'}</p>`;
+            if (p.kesimpulan) {
+                html += '<h4 style="color:#e91e63;margin-top:15px;">📝 Kesimpulan:</h4>';
+                html += `<p style="background:#f5f5f5;padding:15px;border-radius:8px;line-height:1.8;border-left:4px solid #e91e63;">${p.kesimpulan}</p>`;
+            }
+            if (p.detailJawaban && p.detailJawaban.length) {
+                html += '<h4 style="color:#e91e63;margin-top:20px;">📋 Tabel Pengamatan:</h4>';
+                html += '<table class="data-table"><thead><tr><th>Larutan</th><th>Lakmus Merah</th><th>Lakmus Biru</th><th>pH</th><th>Sifat</th><th>Hidrolisis</th><th>Status</th></tr></thead><tbody>';
+                p.detailJawaban.forEach(item => {
+                    const ic = item.benar?'✓':'✗'; const sc = item.benar?'#4caf50':'#f44336';
+                    html += `<tr><td>${item.larutan}</td><td>${item.lakmusMerah||'-'}</td><td>${item.lakmusBiru||'-'}</td><td>${item.pH||'-'}</td><td>${item.sifat||'-'}</td><td>${item.hidrolisis||'-'}</td><td style="color:${sc};font-weight:bold;font-size:1.2em;">${ic}</td></tr>`;
+                    if (!item.benar) html += `<tr style="background:#fff3e0;"><td colspan="7"><small><strong>Jawaban benar:</strong> Lakmus Merah: ${item.jawabanYangBenar?.lakmusMerah||'-'}, Lakmus Biru: ${item.jawabanYangBenar?.lakmusBiru||'-'}, pH: ${item.jawabanYangBenar?.pH||'-'}, Sifat: ${item.jawabanYangBenar?.sifat||'-'}, Hidrolisis: ${item.jawabanYangBenar?.hidrolisis||'-'}</small></td></tr>`;
+                });
+                html += '</tbody></table>';
+            }
+            html += '</div>';
+            document.getElementById('modal-body').innerHTML = html;
+            document.getElementById('detail-modal').style.display = 'block';
         }
 
         function viewDetailQuiz(q) {
-            let html='<div style="max-width:900px;margin:0 auto;">';
-            html+=`<h2 style="color:#e91e63;margin-bottom:20px;text-align:center;">✏️ Detail Jawaban Quiz</h2>`;
-            html+=`<p><strong>Nama:</strong> ${q.nama}</p><p><strong>Kelas:</strong> ${q.kelas}</p><p><strong>Absen:</strong> ${q.absen}</p>`;
-            html+=`<p><strong>Nilai:</strong> <span style="font-size:1.5em;color:#e91e63;font-weight:bold;">${q.nilaiQuiz||0}/100</span></p>`;
-            html+=`<p><strong>Tanggal:</strong> ${q.tanggal?new Date(q.tanggal).toLocaleString('id-ID'):'-'}</p>`;
-            const detail = typeof q.detailJawabanQuiz==='string' ? JSON.parse(q.detailJawabanQuiz||'[]') : (q.detailJawabanQuiz||[]);
-            if(detail.length){
-                html+='<div style="margin-top:15px;">';
-                detail.forEach((item,idx)=>{ const bg=item.benar?'#e8f5e9':'#ffebee'; const col=item.benar?'#4caf50':'#f44336';
-                    html+=`<div style="background:${bg};padding:15px;margin:10px 0;border-radius:8px;border-left:4px solid ${col};"><p style="margin:0;color:#333;"><strong>Soal ${idx+1}:</strong> ${item.pertanyaan}</p><p style="margin:5px 0;color:#666;"><strong>Jawaban:</strong> ${item.jawaban}</p>${!item.benar?`<p style="margin:5px 0;color:${col};"><strong>Jawaban Benar:</strong> ${item.jawabanBenar}</p>`:''}<p style="margin:5px 0;font-weight:bold;color:${col};">${item.benar?'✓ Benar':'✗ Salah'}</p></div>`; });
-                html+='</div>';
+            let html = '<div style="max-width:900px;margin:0 auto;">';
+            html += '<h2 style="color:#e91e63;margin-bottom:20px;text-align:center;">✏️ Detail Jawaban Quiz</h2>';
+            html += `<p><strong>Nama:</strong> ${q.nama}</p><p><strong>Kelas:</strong> ${q.kelas}</p><p><strong>Absen:</strong> ${q.absen}</p>`;
+            html += `<p><strong>Nilai:</strong> <span style="font-size:1.5em;color:#e91e63;font-weight:bold;">${q.nilaiQuiz||0}/100</span></p>`;
+            html += `<p><strong>Tanggal:</strong> ${q.tanggal ? new Date(q.tanggal).toLocaleString('id-ID') : '-'}</p>`;
+            if (q.detailJawabanQuiz && q.detailJawabanQuiz.length) {
+                html += '<div style="margin-top:15px;">';
+                q.detailJawabanQuiz.forEach((item, idx) => {
+                    const bg=item.benar?'#e8f5e9':'#ffebee'; const col=item.benar?'#4caf50':'#f44336';
+                    html += `<div style="background:${bg};padding:15px;margin:10px 0;border-radius:8px;border-left:4px solid ${col};">
+                        <p style="margin:0;color:#333;"><strong>Soal ${idx+1}:</strong> ${item.pertanyaan}</p>
+                        <p style="margin:5px 0;color:#666;"><strong>Jawaban:</strong> ${item.jawaban}</p>
+                        ${!item.benar?`<p style="margin:5px 0;color:${col};"><strong>Jawaban Benar:</strong> ${item.jawabanBenar}</p>`:''}
+                        <p style="margin:5px 0;font-weight:bold;color:${col};">${item.benar?'✓ Benar':'✗ Salah'}</p>
+                    </div>`;
+                });
+                html += '</div>';
             }
-            html+='</div>';
-            document.getElementById('modal-body').innerHTML=html;
-            document.getElementById('detail-modal').style.display='block';
+            html += '</div>';
+            document.getElementById('modal-body').innerHTML = html;
+            document.getElementById('detail-modal').style.display = 'block';
         }
 
+        // ── Download Excel ────────────────────────────────────────────────────
         function downloadExcel(type) {
-            const wb=XLSX.utils.book_new();
-            if(type==='praktikum'){
-                const pRows=_praktikumData.map((d,i)=>({'No':i+1,'Nama':d.nama,'Kelas':d.kelas,'Absen':d.absen,'Nilai Praktikum':d.nilaiPraktikum||0,'Tanggal':d.tanggal?new Date(d.tanggal).toLocaleString('id-ID'):'-'}));
-                const ws=XLSX.utils.json_to_sheet(pRows); ws['!cols']=[{wch:5},{wch:25},{wch:15},{wch:8},{wch:17},{wch:22}];
-                XLSX.utils.book_append_sheet(wb,ws,'Rekap Praktikum');
-                const det=[];
-                _praktikumData.forEach(d=>{ const dj=typeof d.detailJawaban==='string'?JSON.parse(d.detailJawaban||'[]'):(d.detailJawaban||[]);
-                    dj.forEach(item=>det.push({'Nama':d.nama,'Kelas':d.kelas,'Absen':d.absen,'Nilai':d.nilaiPraktikum||0,'Larutan':item.larutan||'','Lakmus Merah':item.lakmusMerah||'','Lakmus Biru':item.lakmusBiru||'','pH':item.pH||'','Sifat':item.sifat||'','Hidrolisis':item.hidrolisis||'','Status':item.benar?'Benar':'Salah'}));
-                    if(d.kesimpulan) det.push({'Nama':d.nama,'Kelas':d.kelas,'Absen':d.absen,'Nilai':d.nilaiPraktikum||0,'Larutan':'--- KESIMPULAN ---','Lakmus Merah':d.kesimpulan,'Lakmus Biru':'','pH':'','Sifat':'','Hidrolisis':'','Status':''}); });
-                if(det.length){ const ws2=XLSX.utils.json_to_sheet(det); XLSX.utils.book_append_sheet(wb,ws2,'Detail Jawaban Praktikum'); }
-                XLSX.writeFile(wb,'Rekap_Nilai_Praktikum.xlsx');
-                showNotification('✅ Excel Praktikum berhasil diunduh!','success');
+            const wb = XLSX.utils.book_new();
+            if (type === 'praktikum') {
+                const pRows = _praktikumData.map((d,i) => ({'No':i+1,'Nama':d.nama,'Kelas':d.kelas,'Absen':d.absen,'Nilai Praktikum':d.nilaiPraktikum||0,'Tanggal':d.tanggal?new Date(d.tanggal).toLocaleString('id-ID'):'-'}));
+                const ws = XLSX.utils.json_to_sheet(pRows);
+                ws['!cols'] = [{wch:5},{wch:25},{wch:15},{wch:8},{wch:17},{wch:22}];
+                XLSX.utils.book_append_sheet(wb, ws, 'Rekap Praktikum');
+                XLSX.writeFile(wb, 'Rekap_Nilai_Praktikum.xlsx');
+                showNotification('✅ Excel Praktikum berhasil diunduh!', 'success');
             } else {
-                const qRows=_quizData.map((d,i)=>({'No':i+1,'Nama':d.nama,'Kelas':d.kelas,'Absen':d.absen,'Nilai Quiz':d.nilaiQuiz||0,'Tanggal':d.tanggal?new Date(d.tanggal).toLocaleString('id-ID'):'-'}));
-                const ws=XLSX.utils.json_to_sheet(qRows); ws['!cols']=[{wch:5},{wch:25},{wch:15},{wch:8},{wch:12},{wch:22}];
-                XLSX.utils.book_append_sheet(wb,ws,'Rekap Quiz');
-                const det=[];
-                _quizData.forEach(d=>{ const dj=typeof d.detailJawabanQuiz==='string'?JSON.parse(d.detailJawabanQuiz||'[]'):(d.detailJawabanQuiz||[]);
-                    dj.forEach((item,idx)=>det.push({'Nama':d.nama,'Kelas':d.kelas,'Absen':d.absen,'Nilai Quiz':d.nilaiQuiz||0,'No Soal':idx+1,'Pertanyaan':item.pertanyaan||'','Jawaban Siswa':item.jawaban||'','Jawaban Benar':item.jawabanBenar||'','Status':item.benar?'Benar':'Salah'})); });
-                if(det.length){ const ws2=XLSX.utils.json_to_sheet(det); XLSX.utils.book_append_sheet(wb,ws2,'Detail Jawaban Quiz'); }
-                XLSX.writeFile(wb,'Rekap_Nilai_Quiz.xlsx');
-                showNotification('✅ Excel Quiz berhasil diunduh!','success');
+                const qRows = _quizData.map((d,i) => ({'No':i+1,'Nama':d.nama,'Kelas':d.kelas,'Absen':d.absen,'Nilai Quiz':d.nilaiQuiz||0,'Tanggal':d.tanggal?new Date(d.tanggal).toLocaleString('id-ID'):'-'}));
+                const ws = XLSX.utils.json_to_sheet(qRows);
+                ws['!cols'] = [{wch:5},{wch:25},{wch:15},{wch:8},{wch:12},{wch:22}];
+                XLSX.utils.book_append_sheet(wb, ws, 'Rekap Quiz');
+                XLSX.writeFile(wb, 'Rekap_Nilai_Quiz.xlsx');
+                showNotification('✅ Excel Quiz berhasil diunduh!', 'success');
             }
         }
 
-        function resetAllData() {
-            if(!confirm('⚠️ Reset SEMUA data? Tindakan ini tidak dapat dibatalkan!')) return;
-            const c=prompt('Ketik RESET untuk konfirmasi:');
-            if(c!=='RESET'){ alert('Reset dibatalkan.'); return; }
-            const keys=[];
-            for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k&&(k.startsWith('dataScore_')||k.startsWith('quizScore_'))) keys.push(k); }
-            keys.forEach(k=>localStorage.removeItem(k));
-            _praktikumData=[]; _quizData=[];
-            renderPraktikumTable([]); renderQuizTable([]);
-            document.getElementById('badge-praktikum').textContent=0;
-            document.getElementById('badge-quiz').textContent=0;
-            showNotification('✅ Data lokal berhasil direset!','success');
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            if(sessionStorage.getItem(SESSION_KEY)==='1'){
-                const gate=document.getElementById('password-gate');
-                if(gate) gate.remove();
-                loadAllData();
-            } else {
-                setTimeout(()=>{ const inp=document.getElementById('pw-input'); if(inp) inp.focus(); },300);
-            }
+        // ── Reset ──────────────────────────────────────────────────────────────
+        document.getElementById('btn-reset-data').addEventListener('click', function() {
+            if (!confirm('⚠️ Reset akan menghapus SEMUA data di Google Sheets.\n\nData TIDAK DAPAT dikembalikan!\n\nLanjutkan?')) return;
+            const confirmText = prompt('Ketik RESET untuk konfirmasi:');
+            if (confirmText !== 'RESET') { alert('❌ Reset dibatalkan.'); return; }
+            alert('ℹ️ Untuk reset data Google Sheets, hapus isi baris data di spreadsheet secara manual.\n\nBuka: sheets.google.com → pilih spreadsheet Hidrolisis Garam → hapus baris data (kecuali baris header).');
         });
     </script>
 </body>
