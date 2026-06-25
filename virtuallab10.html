@@ -104,7 +104,16 @@
 
         footer { background:linear-gradient(135deg,#5b8dd3,#c77ab5); padding:30px 20px; text-align:center; color:white; }
         footer p { margin:5px 0; font-size:1em; line-height:1.6; }
-        @media (max-width:768px) { .content-box{padding:20px;} .recap-controls{flex-direction:column;} .data-table{font-size:.85em;} .data-table th,.data-table td{padding:8px;} .section-header{flex-direction:column;align-items:flex-start;} }
+        @media (max-width:768px) {
+            .content-box { padding:14px; }
+            .back-to-dashboard { margin:14px 14px 0 !important; }
+            .back-to-dashboard button { font-size:0.88em !important; padding:9px 14px !important; }
+            .recap-controls { flex-direction:column; }
+            .data-table { font-size:.82em; }
+            .data-table th, .data-table td { padding:8px 6px; }
+            .section-header { flex-direction:column; align-items:flex-start; }
+            h2 { font-size:1.4em; }
+        }
     </style>
 </head>
 <body>
@@ -139,6 +148,10 @@
                 <p>Laboratorium Virtual Hidrolisis Garam</p>
             </div>
         </header>
+
+        <div class="back-to-dashboard" style="margin:20px 40px 0;">
+            <button onclick="location.href='virtuallab2.html'" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:#4a7bb8;color:white;border:none;border-radius:8px;font-size:1em;font-weight:600;cursor:pointer;transition:all 0.3s;box-shadow:0 2px 8px rgba(0,0,0,0.15);">⬅ Kembali ke Dashboard</button>
+        </div>
 
         <div class="content-box">
             <h2>Rekapan Nilai Praktikum</h2>
@@ -293,17 +306,28 @@
             for (let i = startIdx; i < rows.length; i++) {
                 const row = rows[i];
                 if (!Array.isArray(row)) continue;
-                const nama    = String(row[1] || '').trim();
-                const kelas   = String(row[2] || '').trim();
-                const absen   = String(row[3] || '').trim();
-                const nilai   = parseFloat(row[4]) || 0;
-                const tanggal = String(row[5] || '').trim();
-                const detail  = row[6] || '';
+                const nama       = String(row[1] || '').trim();
+                const kelas      = String(row[2] || '').trim();
+                const absen      = String(row[3] || '').trim();
+                const nilai      = parseFloat(row[4]) || 0;
+                const tanggal    = String(row[5] || '').trim();
+                // Cek apakah ada kolom kesimpulan (kolom 6) dan detail (kolom 7)
+                // atau format lama tanpa kesimpulan (detail di kolom 6)
+                let kesimpulan = '';
+                let detail     = '';
+                if (row.length >= 8) {
+                    // Format baru: tipe,nama,kelas,absen,nilai,tanggal,kesimpulan,detail
+                    kesimpulan = String(row[6] || '').trim();
+                    detail     = row[7] || '';
+                } else {
+                    // Format lama: tipe,nama,kelas,absen,nilai,tanggal,detail
+                    detail     = row[6] || '';
+                }
                 if (!nama) continue;
                 const uk = nama + '__' + kelas + '__' + absen;
                 if (tipe === 'praktikum') {
                     if (!map[uk] || nilai > (map[uk].nilaiPraktikum || 0))
-                        map[uk] = { nama, kelas, absen, nilaiPraktikum: nilai, tanggal, detailJawaban: safeParseJSON(detail) };
+                        map[uk] = { nama, kelas, absen, nilaiPraktikum: nilai, tanggal, kesimpulan, detailJawaban: safeParseJSON(detail) };
                 } else {
                     if (!map[uk] || nilai > (map[uk].nilaiQuiz || 0))
                         map[uk] = { nama, kelas, absen, nilaiQuiz: nilai, tanggal, detailJawabanQuiz: safeParseJSON(detail) };
