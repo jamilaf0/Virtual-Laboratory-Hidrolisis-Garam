@@ -360,6 +360,7 @@
 
     <script>
         // Solutions data
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZrKluR0sVFxw10WPFmlZGVdEf3KvC3h4jmkIHbQHcv2qREeUO5OmJ-rWIrKUfLWmAsw/exec";
         const solutions = {
             '(NH4)2SO4': { 
                 ph: 5.5, 
@@ -537,17 +538,34 @@
 
             // Simpan ke localStorage → terbaca di virtuallab10
             const dataToSave = {
-                nama:    nama,
-                kelas:   kelas,
-                absen:   absen,
-                nilaiPraktikum: score,
-                tanggal: new Date().toISOString(),
-                kesimpulan: conclusion,
-                detailJawaban: detailJawaban
-            };
-            localStorage.setItem('dataScore_' + nama + '_' + kelas + '_' + absen, JSON.stringify(dataToSave));
-            
-            showNotification('Data tersubmit & tersimpan! Nilai: ' + score, 'success');
+    nama: nama,
+    kelas: kelas,
+    absen: absen,
+    nilaiPraktikum: score,
+    tanggal: new Date().toISOString(),
+    kesimpulan: conclusion,
+    detailJawaban: detailJawaban
+};
+
+localStorage.setItem('dataScore_' + nama + '_' + kelas + '_' + absen, JSON.stringify(dataToSave));
+
+fetch(SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        nama: nama,
+        kelas: kelas,
+        absen: absen,
+        jenis: "Praktikum",
+        nilai: score,
+        kesimpulan: conclusion
+    })
+});
+
+showNotification('Data tersubmit & tersimpan! Nilai: ' + score, 'success');
         }
 
         // Isi tabel otomatis dari data virtuallab7
