@@ -292,12 +292,31 @@
         </header>
 
         <div class="back-to-dashboard">
-            <button class="btn-back" onclick="alert('Kembali ke halaman utama')">
-                ← Kembali ke Dashboard
-            </button>
-        </div>
+    <button class="btn-back" onclick="location.href='virtuallab2.html'">
+        ⬅ Kembali ke Dashboard
+    </button>
+</div>
 
         <div class="content-page">
+            <!-- IDENTITAS SISWA -->
+            <div class="content-box" style="border-left-color:#e91e63;">
+                <h2 style="color:#e91e63;">📋 Identitas Siswa</h2>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-top:10px;">
+                    <div>
+                        <label style="font-weight:600;color:#444;display:block;margin-bottom:6px;">Nama Lengkap</label>
+                        <input type="text" id="input-nama" placeholder="Masukkan nama lengkap..." style="width:100%;padding:10px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:1em;outline:none;">
+                    </div>
+                    <div>
+                        <label style="font-weight:600;color:#444;display:block;margin-bottom:6px;">Kelas</label>
+                        <input type="text" id="input-kelas" placeholder="Contoh: XI IPA 1" style="width:100%;padding:10px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:1em;outline:none;">
+                    </div>
+                    <div>
+                        <label style="font-weight:600;color:#444;display:block;margin-bottom:6px;">Nomor Absen</label>
+                        <input type="text" id="input-absen" placeholder="Contoh: 12" style="width:100%;padding:10px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:1em;outline:none;">
+                    </div>
+                </div>
+            </div>
+
             <div class="content-box">
                 <h2>Tabel Data Hasil Pengamatan</h2>
                 <table class="data-table">
@@ -440,6 +459,15 @@
         }
 
         function submitData() {
+            // Validasi identitas
+            const nama  = document.getElementById('input-nama').value.trim();
+            const kelas = document.getElementById('input-kelas').value.trim();
+            const absen = document.getElementById('input-absen').value.trim();
+            if (!nama || !kelas || !absen) {
+                showNotification('Isi identitas siswa terlebih dahulu!', 'error');
+                return;
+            }
+
             const solutionList = ['(NH4)2SO4', 'NaCl', 'CH3COONa', 'NH4CH3COO', 'Na2SO4'];
             let score = 0;
             let correct = 0;
@@ -447,15 +475,12 @@
             // Validasi semua field terisi
             let allFilled = true;
             solutionList.forEach((sol, i) => {
-                const red = document.getElementById(`red${i}`).value;
-                const blue = document.getElementById(`blue${i}`).value;
-                const ph = document.getElementById(`ph${i}`).value;
+                const red   = document.getElementById(`red${i}`).value;
+                const blue  = document.getElementById(`blue${i}`).value;
+                const ph    = document.getElementById(`ph${i}`).value;
                 const nature = document.getElementById(`nature${i}`).value;
                 const hydro = document.getElementById(`hydro${i}`).value;
-                
-                if (!red || !blue || !ph || !nature || !hydro) {
-                    allFilled = false;
-                }
+                if (!red || !blue || !ph || !nature || !hydro) allFilled = false;
             });
             
             if (!allFilled) {
@@ -469,40 +494,96 @@
                 return;
             }
             
-            // Check answers
+            // Check answers & build detailJawaban
+            const detailJawaban = [];
             solutionList.forEach((sol, i) => {
-                const red = document.getElementById(`red${i}`).value;
-                const blue = document.getElementById(`blue${i}`).value;
-                const ph = parseFloat(document.getElementById(`ph${i}`).value);
+                const red   = document.getElementById(`red${i}`).value;
+                const blue  = document.getElementById(`blue${i}`).value;
+                const ph    = parseFloat(document.getElementById(`ph${i}`).value);
                 const nature = document.getElementById(`nature${i}`).value;
                 const hydro = document.getElementById(`hydro${i}`).value;
                 
-                const ans = solutions[sol];
+                const ans    = solutions[sol];
                 const status = document.getElementById(`status${i}`);
                 
-                const isCorrect = red===ans.redLitmus && blue===ans.blueLitmus && 
+                const isCorrect = red===ans.redLitmus && blue===ans.blueLitmus &&
                                   Math.abs(ph-ans.ph)<0.5 && nature===ans.nature && hydro===ans.hydrolysis;
                 
-                if (isCorrect) {
-                    score += 20;
-                    correct++;
-                    status.innerHTML = '<span class="status-correct">✓</span>';
-                } else {
-                    status.innerHTML = '<span class="status-incorrect">✗</span>';
-                }
+                if (isCorrect) { score += 20; correct++; status.innerHTML = '<span class="status-correct">✓</span>'; }
+                else { status.innerHTML = '<span class="status-incorrect">✗</span>'; }
+
+                detailJawaban.push({
+                    larutan: sol,
+                    lakmusMerah: red,
+                    lakmusBiru:  blue,
+                    pH:    ph,
+                    sifat: nature,
+                    hidrolisis: hydro,
+                    benar: isCorrect,
+                    jawabanYangBenar: {
+                        lakmusMerah: ans.redLitmus,
+                        lakmusBiru:  ans.blueLitmus,
+                        pH:    ans.ph,
+                        sifat: ans.nature,
+                        hidrolisis: ans.hydrolysis
+                    }
+                });
             });
             
             document.getElementById('score-display').classList.remove('hidden');
             document.getElementById('data-score').textContent = score;
-            document.getElementById('data-feedback').textContent = 
+            document.getElementById('data-feedback').textContent =
                 `${correct}/5 benar. ` + (score>=80 ? 'Sangat Baik!' : score>=60 ? 'Baik!' : 'Perlu perbaikan.');
+
+            // Simpan ke localStorage → terbaca di virtuallab10
+            const dataToSave = {
+                nama:    nama,
+                kelas:   kelas,
+                absen:   absen,
+                nilaiPraktikum: score,
+                tanggal: new Date().toISOString(),
+                kesimpulan: conclusion,
+                detailJawaban: detailJawaban
+            };
+            localStorage.setItem('dataScore_' + nama + '_' + kelas + '_' + absen, JSON.stringify(dataToSave));
             
-            showNotification('Data tersubmit! Nilai: ' + score, 'success');
+            showNotification('Data tersubmit & tersimpan! Nilai: ' + score, 'success');
+        }
+
+        // Isi tabel otomatis dari data virtuallab7
+        function loadDataFromLab7() {
+            const raw = localStorage.getItem('labData_virtuallab7');
+            if (!raw) return;
+
+            const labData = JSON.parse(raw);
+            const solutionList = ['(NH4)2SO4', 'NaCl', 'CH3COONa', 'NH4CH3COO', 'Na2SO4'];
+
+            labData.forEach(item => {
+                const idx = solutionList.indexOf(item.solution);
+                if (idx === -1) return;
+
+                const redEl    = document.getElementById(`red${idx}`);
+                const blueEl   = document.getElementById(`blue${idx}`);
+                const phEl     = document.getElementById(`ph${idx}`);
+                const natureEl = document.getElementById(`nature${idx}`);
+                const hydroEl  = document.getElementById(`hydro${idx}`);
+
+                if (redEl)    redEl.value    = item.redLitmus  || '';
+                if (blueEl)   blueEl.value   = item.blueLitmus || '';
+                if (phEl)     phEl.value     = item.ph         || '';
+                if (natureEl) natureEl.value = item.nature     || '';
+                if (hydroEl)  hydroEl.value  = item.hydrolysis || '';
+            });
+
+            if (labData.length > 0) {
+                showNotification('Data dari Virtual Lab berhasil dimuat!', 'success');
+            }
         }
 
         // Init
         window.addEventListener('load', () => {
             loadDataTable();
+            loadDataFromLab7();
         });
     </script>
 </body>
