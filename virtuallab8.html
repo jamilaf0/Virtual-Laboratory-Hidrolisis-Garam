@@ -340,7 +340,6 @@
     </div>
 
     <script>
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyLaBHufCydK1VT2z9YOO-iRGHw64Q9rgPNLU6cU_TBJPvpHoCI3yJt6yWmfL4mjzmPdg/exec';
         // Solutions data
         const solutions = {
             '(NH4)2SO4': { 
@@ -499,23 +498,6 @@
                 `${correct}/5 benar. ` + (score>=80 ? 'Sangat Baik!' : score>=60 ? 'Baik!' : 'Perlu perbaikan.');
             
             showNotification('Data tersubmit! Nilai: ' + score, 'success');
-            const siswaData = JSON.parse(localStorage.getItem('studentData')) || {};
-
-fetch(APPS_SCRIPT_URL, {
-    method: 'POST',
-    body: JSON.stringify({
-        jenis: 'praktikum',
-        nama: siswaData.nama || '',
-        kelas: siswaData.kelas || '',
-        absen: siswaData.absen || '',
-        nilai: score,
-        tanggal: new Date().toISOString(),
-        kesimpulan: conclusion
-    })
-})
-.then(response => response.text())
-.then(data => console.log(data))
-.catch(error => console.error(error));
         }
 
         // Init
