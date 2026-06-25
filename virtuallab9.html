@@ -683,11 +683,11 @@
             fetch("https://script.google.com/macros/s/AKfycbxZrKluR0sVFxw10WPFmlZGVdEf3KvC3h4jmkIHbQHcv2qREeUO5OmJ-rWIrKUfLWmAsw/exec", {
     method: "POST",
     body: JSON.stringify({
-        nama: nama,
-        kelas: kelas,
-        absen: absen,
-        tanggal: new Date().toISOString(),
-        nilai: score,
+        Nama: nama,
+        Kelas: kelas,
+        Absen: absen,
+        Tanggal: new Date().toISOString(),
+        Nilai: score,
         jumlahBenar: score / 10,
         persentaseKetepatan: score,
         statusKetuntasan: score >= 75 ? "Tuntas" : "Belum Tuntas",
