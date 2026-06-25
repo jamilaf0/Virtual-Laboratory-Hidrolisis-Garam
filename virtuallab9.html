@@ -683,16 +683,20 @@
             fetch("https://script.google.com/macros/s/AKfycbxZrKluR0sVFxw10WPFmlZGVdEf3KvC3h4jmkIHbQHcv2qREeUO5OmJ-rWIrKUfLWmAsw/exec", {
     method: "POST",
     body: JSON.stringify({
-        Nama: nama,
-        Kelas: kelas,
-        Absen: absen,
+
+        jenisData: "quiz",
+
+        Nama: Nama,
+        Kelas: Kelas,
+        Absen: Absen,
         Tanggal: new Date().toISOString(),
         Nilai: score,
         jumlahBenar: score / 10,
         persentaseKetepatan: score,
         statusKetuntasan: score >= 75 ? "Tuntas" : "Belum Tuntas",
-        kesimpulan: "Quiz Hidrolisis Garam",
-        detail: detailJawabanQuiz
+        Kesimpulan: "Quiz Hidrolisis Garam",
+        Detail: Detail Jawaban Quiz
+
     })
 });
 
