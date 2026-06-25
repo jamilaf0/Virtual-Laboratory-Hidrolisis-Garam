@@ -475,6 +475,7 @@
     </div>
 
     <script>
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyLaBHufCydK1VT2z9YOO-iRGHw64Q9rgPNLU6cU_TBJPvpHoCI3yJt6yWmfL4mjzmPdg/exec';
         // ─── Notification ────────────────────────────────────────────────────────────
         function showNotification(msg, type) {
             const notif = document.createElement('div');
@@ -493,94 +494,47 @@
         }
 
         // ─── Load Data dari localStorage ─────────────────────────────────────────────
-        function getAllData() {
-            const praktikumMap = {};
-            const quizMap     = {};
+        async function getAllData() {
+    const response = await fetch(APPS_SCRIPT_URL);
+    const data = await response.json();
 
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (!key) continue;
-
-                if (key.startsWith('dataScore_')) {
-                    const data = JSON.parse(localStorage.getItem(key));
-                    const uk   = `${data.nama}__${data.kelas}__${data.absen}`;
-                    // Simpan nilai tertinggi per user
-                    if (!praktikumMap[uk] || (data.nilaiPraktikum || 0) > praktikumMap[uk].nilaiPraktikum) {
-                        praktikumMap[uk] = data;
-                    }
-                } else if (key.startsWith('quizScore_')) {
-                    const data = JSON.parse(localStorage.getItem(key));
-                    const uk   = `${data.nama}__${data.kelas}__${data.absen}`;
-                    if (!quizMap[uk] || (data.nilaiQuiz || 0) > quizMap[uk].nilaiQuiz) {
-                        quizMap[uk] = data;
-                    }
-                }
-            }
-            return { praktikumMap, quizMap };
-        }
+    return {
+        praktikumMap: data.reduce((obj, item) => {
+            const key = `${item.nama}__${item.kelas}__${item.absen}`;
+            obj[key] = {
+                nama: item.nama,
+                kelas: item.kelas,
+                absen: item.absen,
+                nilaiPraktikum: Number(item.nilai) || 0,
+                tanggal: item.tanggal,
+                kesimpulan: item.kesimpulan || '',
+                detailJawaban: []
+            };
+            return obj;
+        }, {}),
+        quizMap: {}
+    };
+}
 
         // ─── Render Tables ─────────────────────────────────────────────────────────
         let _praktikumData = [];
         let _quizData      = [];
 
-        function loadAllTables() {
-            const { praktikumMap, quizMap } = getAllData();
+async function loadAllTables() {
 
-            _praktikumData = Object.values(praktikumMap);
-            _quizData      = Object.values(quizMap);
+    const { praktikumMap, quizMap } = await getAllData();
 
-            renderPraktikumTable(_praktikumData);
-            renderQuizTable(_quizData);
+    _praktikumData = Object.values(praktikumMap);
+    _quizData = Object.values(quizMap);
 
-            document.getElementById('badge-praktikum').textContent = _praktikumData.length;
-            document.getElementById('badge-quiz').textContent      = _quizData.length;
-        }
+    renderPraktikumTable(_praktikumData);
+    renderQuizTable(_quizData);
 
-        function renderPraktikumTable(rows) {
-            const tbody = document.getElementById('tbody-praktikum');
-            tbody.innerHTML = '';
-            if (rows.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;font-style:italic;">Belum ada data praktikum.</td></tr>';
-                return;
-            }
-            rows.forEach((d, idx) => {
-                const n   = d.nilaiPraktikum || 0;
-                const cls = n >= 80 ? 'nilai-tinggi' : n >= 60 ? 'nilai-sedang' : 'nilai-rendah';
-                const row = tbody.insertRow();
-                row.className = cls;
-                row.innerHTML =
-                    `<td>${idx + 1}</td>` +
-                    `<td>${d.nama}</td>` +
-                    `<td>${d.kelas}</td>` +
-                    `<td>${d.absen}</td>` +
-                    `<td><strong>${n}</strong></td>` +
-                    `<td>${new Date(d.tanggal).toLocaleDateString('id-ID')}</td>` +
-                    `<td><button class="action-btn" onclick='viewDetailPraktikum(${JSON.stringify(d).replace(/'/g,"&apos;")})'>📋 Detail</button></td>`;
-            });
-        }
+    document.getElementById('badge-praktikum').textContent = _praktikumData.length;
+    document.getElementById('badge-quiz').textContent = _quizData.length;
+}
 
-        function renderQuizTable(rows) {
-            const tbody = document.getElementById('tbody-quiz');
-            tbody.innerHTML = '';
-            if (rows.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;font-style:italic;">Belum ada data quiz.</td></tr>';
-                return;
-            }
-            rows.forEach((d, idx) => {
-                const n   = d.nilaiQuiz || 0;
-                const cls = n >= 80 ? 'quiz-tinggi' : n >= 60 ? 'quiz-sedang' : 'quiz-rendah';
-                const row = tbody.insertRow();
-                row.className = cls;
-                row.innerHTML =
-                    `<td>${idx + 1}</td>` +
-                    `<td>${d.nama}</td>` +
-                    `<td>${d.kelas}</td>` +
-                    `<td>${d.absen}</td>` +
-                    `<td><strong>${n}</strong></td>` +
-                    `<td>${new Date(d.tanggal).toLocaleDateString('id-ID')}</td>` +
-                    `<td><button class="action-btn" onclick='viewDetailQuiz(${JSON.stringify(d).replace(/'/g,"&apos;")})'>📋 Detail</button></td>`;
-            });
-        }
+function renderPraktikumTable(rows) {
 
         // ─── Filter ─────────────────────────────────────────────────────────────────
         function applyFilters() {
@@ -840,9 +794,9 @@
         // ─── Init ─────────────────────────────────────────────────────────────────
         document.getElementById('btn-reset-data').addEventListener('click', resetAllData);
 
-        window.addEventListener('load', () => {
-            loadAllTables();
-        });
+        window.addEventListener('load', async () => {
+    await loadAllTables();
+});
     </script>
 </body>
 </html>
